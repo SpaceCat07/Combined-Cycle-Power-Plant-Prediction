@@ -30,7 +30,7 @@ Riwayat prediksi dengan pagination dan analytics charts
 
 ### 1. Clone atau Download Project
 ```cmd
-cd "d:\File Khan\Koolyeah\Sem 5\Data Mining\UAS PPD"
+git clone https://github.com/SpaceCat07/Combined-Cycle-Power-Plant-Prediction.git
 ```
 
 ### 2. Install Dependencies
@@ -58,8 +58,8 @@ Aplikasi akan berjalan di: `http://localhost:5000`
 
 ### Demo Account
 Untuk mencoba aplikasi, gunakan:
-- **Username**: demo
-- **Password**: demo123
+- **Username**: admin
+- **Password**: admin123
 
 ### Upload Model
 1. Login ke aplikasi
