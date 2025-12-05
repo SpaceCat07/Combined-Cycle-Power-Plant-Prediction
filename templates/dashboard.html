@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Power Plant Predictor{% endblock %}
+
+{% block content %}
+<!-- Welcome Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card fade-in">
+            <div class="card-body p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="mb-2">
+                            <i class="fas fa-home me-2" style="color: var(--secondary-color);"></i>
+                            Welcome back, <strong>{{ user[1] }}</strong>!
+                        </h2>
+                        <p class="lead mb-0 text-muted">Ready to make some power predictions? Access all your tools from here.</p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <div class="text-muted">
+                            <i class="fas fa-calendar me-1"></i>
+                            <span id="currentDate"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stats-card fade-in" style="animation-delay: 0.1s;">
+            <div class="stats-number">{{ stats.total_predictions }}</div>
+            <div class="stats-text">
+                <i class="fas fa-chart-line me-1"></i>Total Predictions
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stats-card fade-in" style="animation-delay: 0.2s; background: var(--gradient-success);">
+            <div class="stats-number">{{ "%.1f"|format(stats.avg_power) }}</div>
+            <div class="stats-text">
+                <i class="fas fa-bolt me-1"></i>Avg Power (MW)
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stats-card fade-in" style="animation-delay: 0.3s; background: var(--gradient-secondary);">
+            <div class="stats-number">{{ "%.1f"|format(stats.max_power) }}</div>
+            <div class="stats-text">
+                <i class="fas fa-arrow-up me-1"></i>Max Power (MW)
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stats-card fade-in" style="animation-delay: 0.4s; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <div class="stats-number">{{ "%.1f"|format(stats.min_power) }}</div>
+            <div class="stats-text">
+                <i class="fas fa-arrow-down me-1"></i>Min Power (MW)
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="card slide-in-right">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-rocket me-2"></i>Quick Actions
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <a href="{{ url_for('predict') }}" class="text-decoration-none">
+                            <div class="stats-card" style="background: var(--gradient-primary);">
+                                <i class="fas fa-brain fa-3x mb-3"></i>
+                                <h5>Make Prediction</h5>
+                                <p class="mb-0">Predict power output based on operating conditions</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="{{ url_for('charts') }}" class="text-decoration-none">
+                            <div class="stats-card" style="background: var(--gradient-success);">
+                                <i class="fas fa-chart-line fa-3x mb-3"></i>
+                                <h5>View Charts</h5>
+                                <p class="mb-0">Analyze prediction trends and patterns</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="{{ url_for('history') }}" class="text-decoration-none">
+                            <div class="stats-card" style="background: var(--gradient-secondary);">
+                                <i class="fas fa-history fa-3x mb-3"></i>
+                                <h5>View History</h5>
+                                <p class="mb-0">Browse all your previous predictions</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="{{ url_for('api_model_info') }}" class="text-decoration-none" target="_blank">
+                            <div class="stats-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <i class="fas fa-cog fa-3x mb-3"></i>
+                                <h5>Model Info</h5>
+                                <p class="mb-0">View model details and performance</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Information -->
+    <div class="col-lg-4">
+        <div class="card slide-in-right" style="animation-delay: 0.2s;">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-robot me-2"></i>Model Information
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if model_info.status == 'loaded' %}
+                    <div class="text-success mb-3">
+                        <i class="fas fa-check-circle me-1"></i>
+                        <strong>Status:</strong> Model Ready
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Type:</strong> {{ model_info.model_type }}
+                    </div>
+                    
+                    {% if model_info.n_estimators %}
+                    <div class="mb-3">
+                        <strong>Trees:</strong> {{ model_info.n_estimators }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <strong>Input Features:</strong>
+                        <ul class="list-unstyled mt-2">
+                            {% for feature in model_info.feature_names %}
+                                <li><i class="fas fa-dot-circle me-1" style="font-size: 0.5rem; color: var(--secondary-color);"></i>{{ feature }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    {% if model_info.feature_importance %}
+                        <div class="mb-3">
+                            <strong>Feature Importance:</strong>
+                            {% for feature, importance in model_info.feature_importance.items() %}
+                                <div class="mb-2">
+                                    <small class="fw-bold">{{ feature }}</small>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar" style="width: {{ (importance * 100)|round(1) }}%"></div>
+                                    </div>
+                                    <small class="text-muted">{{ (importance * 100)|round(1) }}%</small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-danger">
+                        <i class="fas fa-exclamation-triangle me-1"></i>
+                        <strong>Model not loaded</strong>
+                    </div>
+                    <p class="mb-0">Please check if random_forest_model.pkl file exists.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Predictions -->
+{% if recent_predictions %}
+<div class="row">
+    <div class="col-12">
+        <div class="card fade-in" style="animation-delay: 0.6s;">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock me-2"></i>Recent Predictions
+                </h5>
+                <a href="{{ url_for('history') }}" class="btn btn-primary btn-sm">
+                    View All <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-calendar me-1"></i>Date</th>
+                                <th><i class="fas fa-thermometer-half me-1"></i>Temp (°C)</th>
+                                <th><i class="fas fa-tachometer-alt me-1"></i>Pressure</th>
+                                <th><i class="fas fa-tint me-1"></i>Humidity</th>
+                                <th><i class="fas fa-wind me-1"></i>Vacuum</th>
+                                <th><i class="fas fa-bolt me-1"></i>Power (MW)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prediction in recent_predictions %}
+                            <tr>
+                                <td>{{ prediction.prediction_date[:16] }}</td>
+                                <td>
+                                    <span class="badge" style="background: linear-gradient(45deg, #ff6b6b, #ffa500);">
+                                        {{ "%.2f"|format(prediction.temperature) }}°C
+                                    </span>
+                                </td>
+                                <td>{{ "%.2f"|format(prediction.ambient_pressure) }}</td>
+                                <td>{{ "%.1f"|format(prediction.relative_humidity) }}%</td>
+                                <td>{{ "%.2f"|format(prediction.exhaust_vacuum) }}</td>
+                                <td>
+                                    <span class="badge bg-success fs-6">
+                                        {{ "%.2f"|format(prediction.predicted_power) }} MW
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row">
+    <div class="col-12">
+        <div class="card fade-in" style="animation-delay: 0.6s;">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-chart-line fa-4x text-muted mb-3"></i>
+                <h5>No Predictions Yet</h5>
+                <p class="text-muted mb-4">Start by making your first power prediction!</p>
+                <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-brain me-2"></i>Make Your First Prediction
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Display current date
+document.addEventListener('DOMContentLoaded', function() {
+    const now = new Date();
+    const options = { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    };
+    document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+    
+    // Add hover effects to action cards
+    document.querySelectorAll('.stats-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-10px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+    
+    // Auto-refresh stats every 30 seconds
+    setInterval(function() {
+        // You can add AJAX call here to refresh stats without page reload
+        console.log('Stats could be refreshed here');
+    }, 30000);
+});
+</script>
+{% endblock %}

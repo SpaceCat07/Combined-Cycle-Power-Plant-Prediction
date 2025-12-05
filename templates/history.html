@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+
+{% block title %}History - Power Plant Predictor{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card fade-in">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0">
+                        <i class="fas fa-history me-2"></i>Prediction History
+                    </h4>
+                    <p class="mb-0 mt-2">Complete record of all your power predictions</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('predict') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>New Prediction
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Summary -->
+{% if stats.total_predictions > 0 %}
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stats-card fade-in" style="animation-delay: 0.1s;">
+            <div class="stats-number">{{ stats.total_predictions }}</div>
+            <div class="stats-text">
+                <i class="fas fa-list me-1"></i>Total Predictions
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stats-card fade-in" style="animation-delay: 0.2s; background: var(--gradient-success);">
+            <div class="stats-number">{{ "%.1f"|format(stats.avg_power) }}</div>
+            <div class="stats-text">
+                <i class="fas fa-bolt me-1"></i>Average Power (MW)
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stats-card fade-in" style="animation-delay: 0.3s; background: var(--gradient-secondary);">
+            <div class="stats-number">{{ "%.1f"|format(stats.max_power) }}</div>
+            <div class="stats-text">
+                <i class="fas fa-arrow-up me-1"></i>Maximum Power (MW)
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stats-card fade-in" style="animation-delay: 0.4s; background: linear-gradient(135deg, #f093fb, #f5576c);">
+            <div class="stats-number">{{ "%.1f"|format(stats.min_power) }}</div>
+            <div class="stats-text">
+                <i class="fas fa-arrow-down me-1"></i>Minimum Power (MW)
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Prediction History Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card slide-in-right">
+            <div class="card-body">
+                {% if predictions %}
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="historyTable">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <i class="fas fa-calendar me-1"></i>Date & Time
+                                    </th>
+                                    <th>
+                                        <i class="fas fa-thermometer-half me-1 text-danger"></i>Temperature
+                                    </th>
+                                    <th>
+                                        <i class="fas fa-tachometer-alt me-1 text-primary"></i>Pressure
+                                    </th>
+                                    <th>
+                                        <i class="fas fa-tint me-1 text-info"></i>Humidity
+                                    </th>
+                                    <th>
+                                        <i class="fas fa-wind me-1 text-purple"></i>Vacuum
+                                    </th>
+                                    <th>
+                                        <i class="fas fa-bolt me-1 text-warning"></i>Power Output
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prediction in predictions %}
+                                <tr class="fade-in" style="animation-delay: {{ (loop.index * 0.05)|round(2) }}s;">
+                                    <td class="fw-bold">
+                                        <div>{{ prediction.prediction_date[:10] }}</div>
+                                        <small class="text-muted">{{ prediction.prediction_date[11:19] }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge" style="background: linear-gradient(45deg, #e74c3c, #f39c12); color: white; padding: 0.5rem;">
+                                            {{ "%.2f"|format(prediction.temperature) }}°C
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge" style="background: linear-gradient(45deg, #3498db, #2980b9); color: white; padding: 0.5rem;">
+                                            {{ "%.2f"|format(prediction.ambient_pressure) }} mbar
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge" style="background: linear-gradient(45deg, #1abc9c, #16a085); color: white; padding: 0.5rem;">
+                                            {{ "%.1f"|format(prediction.relative_humidity) }}%
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge" style="background: linear-gradient(45deg, #9b59b6, #8e44ad); color: white; padding: 0.5rem;">
+                                            {{ "%.2f"|format(prediction.exhaust_vacuum) }} cmHg
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge fs-6" style="background: var(--gradient-success); color: white; padding: 0.7rem 1rem;">
+                                            <i class="fas fa-bolt me-1"></i>
+                                            {{ "%.2f"|format(prediction.predicted_power) }} MW
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if has_prev or has_next %}
+                    <nav aria-label="Prediction history pagination" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('history', page=page-1) }}">
+                                        <i class="fas fa-chevron-left"></i> Previous
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Page {{ page }}
+                                </span>
+                            </li>
+                            
+                            {% if has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('history', page=page+1) }}">
+                                        Next <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+
+                {% else %}
+                    <!-- Empty state -->
+                    <div class="text-center py-5">
+                        <i class="fas fa-history fa-4x text-muted mb-3"></i>
+                        <h5>No Prediction History</h5>
+                        <p class="text-muted mb-4">You haven't made any predictions yet. Start by creating your first prediction!</p>
+                        <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-brain me-2"></i>Make Your First Prediction
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if predictions %}
+<!-- Export Options -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card fade-in" style="animation-delay: 0.6s;">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-download me-2"></i>Export Options
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-2">
+                        <button class="btn btn-outline-success w-100" onclick="exportToCSV()">
+                            <i class="fas fa-file-csv me-2"></i>Export as CSV
+                        </button>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <button class="btn btn-outline-info w-100" onclick="exportToJSON()">
+                            <i class="fas fa-file-code me-2"></i>Export as JSON
+                        </button>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <button class="btn btn-outline-primary w-100" onclick="printHistory()">
+                            <i class="fas fa-print me-2"></i>Print Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Analysis -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card fade-in" style="animation-delay: 0.7s;">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>Quick Analysis
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Power Range:</strong> {{ "%.1f"|format(stats.min_power) }} - {{ "%.1f"|format(stats.max_power) }} MW
+                </div>
+                <div class="mb-3">
+                    <strong>Power Spread:</strong> {{ "%.1f"|format(stats.max_power - stats.min_power) }} MW
+                </div>
+                <div>
+                    <strong>Prediction Count:</strong> {{ stats.total_predictions }} entries
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card fade-in" style="animation-delay: 0.8s;">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-lightbulb me-2"></i>Insights
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if stats.total_predictions >= 5 %}
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            You have made {{ stats.total_predictions }} predictions
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-chart-line text-info me-2"></i>
+                            Average power output: {{ "%.1f"|format(stats.avg_power) }} MW
+                        </li>
+                        <li>
+                            <i class="fas fa-trophy text-warning me-2"></i>
+                            Highest prediction: {{ "%.1f"|format(stats.max_power) }} MW
+                        </li>
+                    </ul>
+                {% else %}
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Make more predictions to see detailed insights and trends!
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function exportToCSV() {
+    const table = document.getElementById('historyTable');
+    const rows = table.querySelectorAll('tr');
+    let csv = '';
+    
+    // Headers
+    csv += 'Date,Time,Temperature_C,Pressure_mbar,Humidity_Percent,Vacuum_cmHg,Power_MW\n';
+    
+    // Data rows (skip header row)
+    for (let i = 1; i < rows.length; i++) {
+        const cells = rows[i].querySelectorAll('td');
+        if (cells.length === 0) continue;
+        
+        // Extract data from each cell
+        const dateTime = cells[0].textContent.trim().split('\n');
+        const date = dateTime[0].trim();
+        const time = dateTime[1] ? dateTime[1].trim() : '';
+        
+        // Extract numeric values from badges
+        const temp = extractNumber(cells[1].textContent);
+        const pressure = extractNumber(cells[2].textContent);
+        const humidity = extractNumber(cells[3].textContent);
+        const vacuum = extractNumber(cells[4].textContent);
+        const power = extractNumber(cells[5].textContent);
+        
+        csv += `${date},${time},${temp},${pressure},${humidity},${vacuum},${power}\n`;
+    }
+    
+    downloadFile(csv, 'power_predictions.csv', 'text/csv');
+}
+
+function exportToJSON() {
+    const predictions = {{ predictions|tojson }};
+    const json = JSON.stringify(predictions, null, 2);
+    downloadFile(json, 'power_predictions.json', 'application/json');
+}
+
+function extractNumber(text) {
+    const match = text.match(/[\d.]+/);
+    return match ? match[0] : '';
+}
+
+function downloadFile(content, filename, contentType) {
+    const blob = new Blob([content], { type: contentType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function printHistory() {
+    window.print();
+}
+
+// Add search functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Add search box if there are predictions
+    {% if predictions %}
+    const cardHeader = document.querySelector('.card-header');
+    if (cardHeader) {
+        const searchDiv = document.createElement('div');
+        searchDiv.className = 'mt-2';
+        searchDiv.innerHTML = `
+            <input type="text" id="searchInput" class="form-control" placeholder="Search predictions..." 
+                   style="max-width: 300px;">
+        `;
+        cardHeader.appendChild(searchDiv);
+        
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#historyTable tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+    }
+    {% endif %}
+    
+    // Add row hover effects
+    document.querySelectorAll('#historyTable tbody tr').forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.01)';
+            this.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
+            this.style.transition = 'all 0.3s ease';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+            this.style.boxShadow = 'none';
+        });
+    });
+});
+
+// Print styles
+const printStyles = `
+    @media print {
+        .btn, .pagination, .card-header { display: none !important; }
+        .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+        body { background: white !important; }
+    }
+`;
+
+const styleSheet = document.createElement('style');
+styleSheet.textContent = printStyles;
+document.head.appendChild(styleSheet);
+</script>
+{% endblock %}
