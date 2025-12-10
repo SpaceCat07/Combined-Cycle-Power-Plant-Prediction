@@ -142,34 +142,88 @@ def predict():
 @login_required 
 def history():
     """Halaman riwayat prediksi"""
-    page = request.args.get('page', 1, type=int)
-    per_page = 20
-    
-    all_predictions = db.get_user_predictions(session['user_id'])
-    
-    # Pagination sederhana
-    start = (page - 1) * per_page
-    end = start + per_page
-    predictions = all_predictions[start:end]
-    
-    has_next = len(all_predictions) > end
-    has_prev = page > 1
-    
-    stats = db.get_prediction_stats(session['user_id'])
-    
-    return render_template('history.html',
-                         predictions=predictions,
-                         page=page,
-                         has_next=has_next,
-                         has_prev=has_prev,
-                         stats=stats)
+    try:
+        page = request.args.get('page', 1, type=int)
+        per_page = 20
+        
+        all_predictions = db.get_user_predictions(session['user_id'])
+        
+        # Pagination sederhana
+        start = (page - 1) * per_page
+        end = start + per_page
+        predictions = all_predictions[start:end]
+        
+        has_next = len(all_predictions) > end
+        has_prev = page > 1
+        
+        stats = db.get_prediction_stats(session['user_id'])
+        
+        # Get model info dengan error handling
+        try:
+            model_info = predictor.get_model_info()
+        except Exception as e:
+            print(f"Error getting model info: {e}")
+            model_info = {
+                "status": "error", 
+                "message": "Model information unavailable",
+                "model_type": "RandomForestRegressor",
+                "feature_names": ["Temperature", "Ambient Pressure", "Relative Humidity", "Exhaust Vacuum"]
+            }
+        
+        return render_template('history.html',
+                             predictions=predictions,
+                             page=page,
+                             has_next=has_next,
+                             has_prev=has_prev,
+                             stats=stats,
+                             model_info=model_info)
+    except Exception as e:
+        print(f"Error in history route: {e}")
+        flash('Error loading prediction history', 'error')
+        return redirect(url_for('dashboard'))
 
 @app.route("/charts")
 @login_required
 def charts():
     """Halaman charts dan visualisasi"""
-    chart_data = db.get_predictions_for_chart(session['user_id'])
-    return render_template('charts.html', chart_data=json.dumps(chart_data))
+    try:
+        chart_data = db.get_predictions_for_chart(session['user_id'])
+        
+        # Get model info dengan fallback
+        try:
+            model_info = predictor.get_model_info()
+            print(f"✅ Model info retrieved: {model_info}")
+        except Exception as e:
+            print(f"⚠️ Error getting model info: {e}")
+            model_info = {
+                "status": "error",
+                "message": "Model info unavailable",
+                "model_type": "RandomForestRegressor",
+                "feature_names": ["Temperature", "Ambient Pressure", "Relative Humidity", "Exhaust Vacuum"]
+            }
+        
+        # Ensure chart_data has proper structure
+        if not chart_data:
+            chart_data = {
+                'dates': [],
+                'power': [],
+                'temperature': [],
+                'pressure': [],
+                'humidity': [],
+                'vacuum': []
+            }
+        
+        print(f"📊 Rendering charts with {len(chart_data.get('power', []))} predictions")
+        
+        return render_template('charts.html', 
+                             chart_data=json.dumps(chart_data), 
+                             model_info=model_info)
+    except Exception as e:
+        print(f"❌ Error in charts route: {e}")
+        import traceback
+        traceback.print_exc()
+        flash(f'Error loading charts: {str(e)}', 'error')
+        return redirect(url_for('dashboard'))
 
 @app.route("/api/chart_data")
 @login_required

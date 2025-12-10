@@ -16,8 +16,29 @@
     </div>
 </div>
 
-{% set chart_data_obj = chart_data|fromjson %}
-{% if chart_data_obj.power|length > 0 %}
+<!-- Check if data exists using JavaScript -->
+<div id="chartContent">
+    <!-- Content will be populated by JavaScript -->
+</div>
+
+<!-- No Data State (initially hidden) -->
+<div id="noDataState" style="display: none;">
+    <div class="row">
+        <div class="col-12">
+            <div class="card fade-in">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-chart-line fa-4x text-muted mb-3"></i>
+                    <h5>No Data for Charts</h5>
+                    <p class="text-muted mb-4">You need at least one prediction to view charts and analytics.</p>
+                    <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-brain me-2"></i>Make Your First Prediction
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 <div class="row">
     <!-- Main Power Trend Chart -->
     <div class="col-lg-8 mb-4">
@@ -26,165 +47,202 @@
                 <h5 class="mb-0">
                     <i class="fas fa-bolt me-2"></i>Power Output Trend
                 </h5>
-                <button class="btn btn-sm btn-outline-primary" onclick="downloadChart('powerTrendChart')">
-                    <i class="fas fa-download me-1"></i>Download
-                </button>
-            </div>
-            <canvas id="powerTrendChart" height="80"></canvas>
-        </div>
-    </div>
 
-    <!-- Quick Statistics -->
-    <div class="col-lg-4 mb-4">
-        <div class="chart-container slide-in-right" style="animation-delay: 0.1s;">
-            <h5 class="mb-3">
-                <i class="fas fa-calculator me-2"></i>Quick Statistics
-            </h5>
-            <div id="quickStats">
-                <!-- Will be populated by JavaScript -->
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <!-- Parameters Chart -->
-    <div class="col-lg-8 mb-4">
-        <div class="chart-container slide-in-right" style="animation-delay: 0.2s;">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">
-                    <i class="fas fa-layer-group me-2"></i>Input Parameters Over Time
-                </h5>
-                <button class="btn btn-sm btn-outline-success" onclick="downloadChart('parametersChart')">
-                    <i class="fas fa-download me-1"></i>Download
-                </button>
-            </div>
-            <canvas id="parametersChart" height="80"></canvas>
-        </div>
-    </div>
-
-    <!-- Power Distribution -->
-    <div class="col-lg-4 mb-4">
-        <div class="chart-container slide-in-right" style="animation-delay: 0.3s;">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">
-                    <i class="fas fa-chart-pie me-2"></i>Power Distribution
-                </h5>
-                <button class="btn btn-sm btn-outline-warning" onclick="downloadChart('powerDistributionChart')">
-                    <i class="fas fa-download me-1"></i>Download
-                </button>
-            </div>
-            <canvas id="powerDistributionChart"></canvas>
-        </div>
-    </div>
-</div>
-
-<!-- Scatter Plots -->
-<div class="row">
-    <div class="col-lg-6 mb-4">
-        <div class="chart-container fade-in" style="animation-delay: 0.4s;">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">
-                    <i class="fas fa-thermometer-half me-2 text-danger"></i>Temperature vs Power
-                </h5>
-                <button class="btn btn-sm btn-outline-danger" onclick="downloadChart('tempScatterChart')">
-                    <i class="fas fa-download me-1"></i>Download
-                </button>
-            </div>
-            <canvas id="tempScatterChart"></canvas>
-        </div>
-    </div>
-
-    <div class="col-lg-6 mb-4">
-        <div class="chart-container fade-in" style="animation-delay: 0.5s;">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">
-                    <i class="fas fa-tachometer-alt me-2 text-primary"></i>Pressure vs Power
-                </h5>
-                <button class="btn btn-sm btn-outline-primary" onclick="downloadChart('pressureScatterChart')">
-                    <i class="fas fa-download me-1"></i>Download
-                </button>
-            </div>
-            <canvas id="pressureScatterChart"></canvas>
-        </div>
-    </div>
-</div>
-
-<!-- Correlation Analysis -->
-<div class="row">
-    <div class="col-lg-8 mb-4">
-        <div class="chart-container fade-in" style="animation-delay: 0.6s;">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">
-                    <i class="fas fa-project-diagram me-2"></i>Parameter Correlation with Power
-                </h5>
-                <button class="btn btn-sm btn-outline-info" onclick="downloadChart('correlationChart')">
-                    <i class="fas fa-download me-1"></i>Download
-                </button>
-            </div>
-            <canvas id="correlationChart"></canvas>
-        </div>
-    </div>
-
-    <!-- Export All Options -->
-    <div class="col-lg-4 mb-4">
-        <div class="card fade-in" style="animation-delay: 0.7s;">
-            <div class="card-header">
-                <h6 class="mb-0">
-                    <i class="fas fa-download me-2"></i>Export Options
-                </h6>
-            </div>
-            <div class="card-body">
-                <div class="d-grid gap-2">
-                    <button class="btn btn-primary" onclick="downloadAllCharts()">
-                        <i class="fas fa-images me-2"></i>Download All Charts
-                    </button>
-                    <button class="btn btn-success" onclick="generateReport()">
-                        <i class="fas fa-file-pdf me-2"></i>Generate Report
-                    </button>
-                    <button class="btn btn-info" onclick="shareCharts()">
-                        <i class="fas fa-share me-2"></i>Share Analytics
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-{% else %}
-<!-- No Data State -->
-<div class="row">
-    <div class="col-12">
-        <div class="card fade-in">
-            <div class="card-body text-center py-5">
-                <i class="fas fa-chart-line fa-4x text-muted mb-3"></i>
-                <h5>No Data for Charts</h5>
-                <p class="text-muted mb-4">You need at least one prediction to view charts and analytics.</p>
-                <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-brain me-2"></i>Make Your First Prediction
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
-{% endblock %}
 
 {% block extra_scripts %}
 <script>
-const chartData = {{ chart_data }};
+// Parse chart data from server
+let chartData;
+try {
+    chartData = {{ chart_data|safe }};
+    console.log('Chart data loaded:', chartData);
+    console.log('Data lengths:', {
+        power: chartData.power ? chartData.power.length : 0,
+        temperature: chartData.temperature ? chartData.temperature.length : 0,
+        pressure: chartData.pressure ? chartData.pressure.length : 0,
+        humidity: chartData.humidity ? chartData.humidity.length : 0,
+        vacuum: chartData.vacuum ? chartData.vacuum.length : 0
+    });
+} catch (e) {
+    console.error('Error parsing chart data:', e);
+    chartData = { power: [], dates: [], temperature: [], pressure: [], humidity: [], vacuum: [] };
+}
+
 const charts = {};
 
-{% if chart_data_obj.power|length > 0 %}
-// Initialize all charts when page loads
+// Initialize page when loaded
 document.addEventListener('DOMContentLoaded', function() {
-    initializePowerTrendChart();
-    initializeParametersChart();
-    initializePowerDistributionChart();
-    initializeScatterCharts();
-    initializeCorrelationChart();
-    updateQuickStats();
+    console.log('DOM Content Loaded - initializing charts');
+    
+    if (chartData && chartData.power && chartData.power.length > 0) {
+        console.log('Chart data available - initializing all charts');
+        initializeChartsContent();
+        initializePowerTrendChart();
+        initializeParametersChart();
+        initializePowerDistributionChart();
+        initializeScatterCharts();
+        initializeCorrelationChart();
+        updateQuickStats();
+    } else {
+        console.log('No chart data - showing charts with sample/no data state');
+        initializeChartsContent();
+        // Initialize correlation chart anyway to show structure
+        setTimeout(() => {
+            initializeCorrelationChart();
+        }, 500);
+        // Show no data state for other charts
+        document.getElementById('noDataState').style.display = 'block';
+    }
 });
+
+function initializeChartsContent() {
+    document.getElementById('chartContent').innerHTML = `
+        <div class="row">
+            <!-- Main Power Trend Chart -->
+            <div class="col-lg-8 mb-4">
+                <div class="chart-container slide-in-right">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">
+                            <i class="fas fa-bolt me-2"></i>Power Output Trend
+                        </h5>
+                        <button class="btn btn-sm btn-outline-primary" onclick="downloadChart('powerTrendChart')">
+                            <i class="fas fa-download me-1"></i>Download
+                        </button>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="powerTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Statistics -->
+            <div class="col-lg-4 mb-4">
+                <div class="chart-container small slide-in-right" style="animation-delay: 0.1s;">
+                    <h5 class="mb-3">
+                        <i class="fas fa-calculator me-2"></i>Quick Statistics
+                    </h5>
+                    <div id="quickStats">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Parameters Chart -->
+            <div class="col-lg-8 mb-4">
+                <div class="chart-container slide-in-right" style="animation-delay: 0.2s;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">
+                            <i class="fas fa-layer-group me-2"></i>Input Parameters Over Time
+                        </h5>
+                        <button class="btn btn-sm btn-outline-success" onclick="downloadChart('parametersChart')">
+                            <i class="fas fa-download me-1"></i>Download
+                        </button>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="parametersChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Power Distribution -->
+            <div class="col-lg-4 mb-4">
+                <div class="chart-container small slide-in-right" style="animation-delay: 0.3s;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-pie me-2"></i>Power Distribution
+                        </h5>
+                        <button class="btn btn-sm btn-outline-warning" onclick="downloadChart('powerDistributionChart')">
+                            <i class="fas fa-download me-1"></i>Download
+                        </button>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="powerDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scatter Plots -->
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="chart-container small fade-in" style="animation-delay: 0.4s;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">
+                            <i class="fas fa-thermometer-half me-2 text-danger"></i>Temperature vs Power
+                        </h5>
+                        <button class="btn btn-sm btn-outline-danger" onclick="downloadChart('tempScatterChart')">
+                            <i class="fas fa-download me-1"></i>Download
+                        </button>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="tempScatterChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 mb-4">
+                <div class="chart-container small fade-in" style="animation-delay: 0.5s;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">
+                            <i class="fas fa-tachometer-alt me-2 text-info"></i>Pressure vs Power
+                        </h5>
+                        <button class="btn btn-sm btn-outline-info" onclick="downloadChart('pressureScatterChart')">
+                            <i class="fas fa-download me-1"></i>Download
+                        </button>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="pressureScatterChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Correlation Analysis -->
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="chart-container slide-in-right" style="animation-delay: 0.6s;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">
+                            <i class="fas fa-project-diagram me-2"></i>Parameter Correlation with Power
+                        </h5>
+                        <button class="btn btn-sm btn-outline-info" onclick="downloadChart('correlationChart')">
+                            <i class="fas fa-download me-1"></i>Download
+                        </button>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="correlationChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export All Options -->
+            <div class="col-lg-4 mb-4">
+                <div class="card fade-in" style="animation-delay: 0.7s;">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-download me-2"></i>Export Options
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary" onclick="downloadAllCharts()">
+                                <i class="fas fa-images me-2"></i>Download All Charts
+                            </button>
+                            <button class="btn btn-success" onclick="generateReport()">
+                                <i class="fas fa-file-pdf me-2"></i>Generate Report
+                            </button>
+                            <button class="btn btn-info" onclick="shareCharts()">
+                                <i class="fas fa-share me-2"></i>Share Analytics
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
 
 function initializePowerTrendChart() {
     const ctx = document.getElementById('powerTrendChart').getContext('2d');
@@ -211,6 +269,14 @@ function initializePowerTrendChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    top: 20,
+                    right: 20,
+                    bottom: 30,
+                    left: 20
+                }
+            },
             interaction: {
                 intersect: false,
                 mode: 'index'
@@ -315,6 +381,14 @@ function initializeParametersChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    top: 20,
+                    right: 20,
+                    bottom: 30,
+                    left: 20
+                }
+            },
             interaction: {
                 intersect: false,
                 mode: 'index'
@@ -404,6 +478,15 @@ function initializePowerDistributionChart() {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    top: 10,
+                    right: 10,
+                    bottom: 20,
+                    left: 10
+                }
+            },
             plugins: {
                 legend: {
                     position: 'bottom',
@@ -448,6 +531,15 @@ function initializeScatterCharts() {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    top: 15,
+                    right: 15,
+                    bottom: 25,
+                    left: 15
+                }
+            },
             scales: {
                 x: {
                     title: {
@@ -495,6 +587,15 @@ function initializeScatterCharts() {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    top: 15,
+                    right: 15,
+                    bottom: 25,
+                    left: 15
+                }
+            },
             scales: {
                 x: {
                     title: {
@@ -525,6 +626,93 @@ function initializeScatterCharts() {
 function initializeCorrelationChart() {
     const ctx = document.getElementById('correlationChart').getContext('2d');
     
+    // Check if data exists
+    if (!chartData || !chartData.power || chartData.power.length === 0) {
+        console.log('No data available for correlation chart - using sample data');
+        // Use sample data to show chart structure
+        charts.correlationChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Temperature', 'Pressure', 'Humidity', 'Vacuum'],
+                datasets: [{
+                    label: 'Correlation with Power',
+                    data: [0.7, 0.5, 0.3, 0.8], // Sample correlation values
+                    backgroundColor: [
+                        'rgba(231, 76, 60, 0.8)',
+                        'rgba(52, 152, 219, 0.8)',
+                        'rgba(46, 204, 113, 0.8)',
+                        'rgba(155, 89, 182, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(231, 76, 60, 1)',
+                        'rgba(52, 152, 219, 1)',
+                        'rgba(46, 204, 113, 1)',
+                        'rgba(155, 89, 182, 1)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        top: 20,
+                        right: 20,
+                        bottom: 30,
+                        left: 20
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            padding: 15
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        cornerRadius: 10,
+                        callbacks: {
+                            label: function(context) {
+                                return `Correlation: ${context.parsed.y.toFixed(3)}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Parameters'
+                        },
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        max: 1,
+                        title: {
+                            display: true,
+                            text: 'Absolute Correlation'
+                        },
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        },
+                        ticks: {
+                            stepSize: 0.2
+                        }
+                    }
+                }
+            }
+        });
+        return;
+    }
+    
     const correlations = [
         calculateCorrelation(chartData.temperature, chartData.power),
         calculateCorrelation(chartData.pressure, chartData.power),
@@ -532,13 +720,15 @@ function initializeCorrelationChart() {
         calculateCorrelation(chartData.vacuum, chartData.power)
     ];
     
+    console.log('Correlation values:', correlations);
+    
     charts.correlationChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: ['Temperature', 'Pressure', 'Humidity', 'Vacuum'],
             datasets: [{
                 label: 'Correlation with Power',
-                data: correlations.map(Math.abs), // Show absolute correlation
+                data: correlations.map(val => Math.abs(val) || 0), // Ensure valid numbers
                 backgroundColor: [
                     'rgba(231, 76, 60, 0.8)',
                     'rgba(52, 152, 219, 0.8)',
@@ -556,25 +746,58 @@ function initializeCorrelationChart() {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    top: 20,
+                    right: 20,
+                    bottom: 30,
+                    left: 20
+                }
+            },
             plugins: {
                 legend: {
-                    display: false
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        padding: 15
+                    }
                 },
                 tooltip: {
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    cornerRadius: 10,
                     callbacks: {
                         label: function(context) {
-                            return `Correlation: ${correlations[context.dataIndex].toFixed(3)}`;
+                            const actualCorr = correlations[context.dataIndex];
+                            return `Correlation: ${actualCorr ? actualCorr.toFixed(3) : '0.000'}`;
                         }
                     }
                 }
             },
             scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Parameters'
+                    },
+                    grid: {
+                        display: false
+                    }
+                },
                 y: {
                     beginAtZero: true,
                     max: 1,
                     title: {
                         display: true,
                         text: 'Absolute Correlation'
+                    },
+                    grid: {
+                        color: 'rgba(0,0,0,0.1)'
+                    },
+                    ticks: {
+                        stepSize: 0.2
                     }
                 }
             }
@@ -583,19 +806,38 @@ function initializeCorrelationChart() {
 }
 
 function calculateCorrelation(x, y) {
-    if (x.length !== y.length || x.length === 0) return 0;
+    if (!x || !y || x.length !== y.length || x.length === 0) {
+        console.log('Invalid data for correlation calculation');
+        return 0;
+    }
     
-    const n = x.length;
-    const sumX = x.reduce((a, b) => a + b, 0);
-    const sumY = y.reduce((a, b) => a + b, 0);
-    const sumXY = x.reduce((sum, xi, i) => sum + xi * y[i], 0);
-    const sumXX = x.reduce((sum, xi) => sum + xi * xi, 0);
-    const sumYY = y.reduce((sum, yi) => sum + yi * yi, 0);
+    // Convert to numbers and filter out invalid values
+    const validX = x.map(val => parseFloat(val)).filter(val => !isNaN(val));
+    const validY = y.map(val => parseFloat(val)).filter(val => !isNaN(val));
+    
+    if (validX.length !== validY.length || validX.length < 2) {
+        console.log('Insufficient valid data for correlation');
+        return 0;
+    }
+    
+    const n = validX.length;
+    const sumX = validX.reduce((a, b) => a + b, 0);
+    const sumY = validY.reduce((a, b) => a + b, 0);
+    const sumXY = validX.reduce((sum, xi, i) => sum + xi * validY[i], 0);
+    const sumXX = validX.reduce((sum, xi) => sum + xi * xi, 0);
+    const sumYY = validY.reduce((sum, yi) => sum + yi * yi, 0);
     
     const numerator = n * sumXY - sumX * sumY;
     const denominator = Math.sqrt((n * sumXX - sumX * sumX) * (n * sumYY - sumY * sumY));
     
-    return denominator === 0 ? 0 : numerator / denominator;
+    if (denominator === 0) {
+        console.log('Zero denominator in correlation calculation');
+        return 0;
+    }
+    
+    const correlation = numerator / denominator;
+    console.log(`Correlation calculated: ${correlation}`);
+    return isNaN(correlation) ? 0 : correlation;
 }
 
 function updateQuickStats() {
@@ -678,6 +920,5 @@ function shareCharts() {
         });
     }
 }
-{% endif %}
 </script>
 {% endblock %}
