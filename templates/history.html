@@ -301,9 +301,14 @@ function exportToCSV() {
 }
 
 function exportToJSON() {
-    const predictions = {{ predictions|tojson }};
-    const json = JSON.stringify(predictions, null, 2);
-    downloadFile(json, 'power_predictions.json', 'application/json');
+    try {
+        const predictions = {{ predictions|tojson|safe }};
+        const json = JSON.stringify(predictions, null, 2);
+        downloadFile(json, 'power_predictions.json', 'application/json');
+    } catch (error) {
+        console.error('Error exporting to JSON:', error);
+        alert('Error exporting data. Please try again.');
+    }
 }
 
 function extractNumber(text) {

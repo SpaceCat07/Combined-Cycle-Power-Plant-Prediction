@@ -46,7 +46,7 @@ class Database:
         # Buat user admin default jika belum ada
         cursor.execute('SELECT COUNT(*) FROM users WHERE username = ?', ('admin',))
         if cursor.fetchone()[0] == 0:
-            admin_hash = generate_password_hash('admin123')
+            admin_hash = generate_password_hash('admin123', method='pbkdf2:sha256')
             cursor.execute(
                 'INSERT INTO users (username, password_hash, email) VALUES (?, ?, ?)',
                 ('admin', admin_hash, 'admin@powerplant.com')
@@ -61,7 +61,7 @@ class Database:
         cursor = conn.cursor()
         
         try:
-            password_hash = generate_password_hash(password)
+            password_hash = generate_password_hash(password, method='pbkdf2:sha256')
             cursor.execute(
                 'INSERT INTO users (username, password_hash, email) VALUES (?, ?, ?)',
                 (username, password_hash, email)

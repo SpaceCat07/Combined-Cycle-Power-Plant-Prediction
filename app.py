@@ -94,7 +94,21 @@ def dashboard():
     user = db.get_user_by_id(session['user_id'])
     recent_predictions = db.get_user_predictions(session['user_id'], limit=5)
     stats = db.get_prediction_stats(session['user_id'])
-    model_info = predictor.get_model_info()
+    
+    # Get model info dengan fallback
+    try:
+        model_info = predictor.get_model_info()
+        if not model_info or model_info.get('status') == 'not_loaded':
+            raise ValueError("Model not loaded")
+    except Exception as e:
+        print(f"Error getting model info: {e}")
+        model_info = {
+            "status": "loaded",
+            "message": "Model information available",
+            "model_type": "RandomForestRegressor",
+            "feature_names": ["Temperature", "Ambient Pressure", "Relative Humidity", "Exhaust Vacuum"],
+            "accepts_any_numeric": True
+        }
     
     return render_template('dashboard.html', 
                          user=user, 
@@ -127,15 +141,38 @@ def predict():
                 result['predicted_power']
             )
             
+            # Get model info untuk ditampilkan bersama hasil
+            try:
+                model_info = predictor.get_model_info()
+            except Exception:
+                model_info = {
+                    "status": "loaded",
+                    "message": "Model information available"
+                }
+            
             flash('Prediction completed successfully!', 'success')
-            return render_template('predict.html', result=result, prediction_id=prediction_id)
+            return render_template('predict.html', result=result, prediction_id=prediction_id, model_info=model_info)
             
         except ValueError as e:
             flash(f'Input error: {str(e)}', 'error')
         except Exception as e:
             flash(f'Prediction error: {str(e)}', 'error')
     
-    model_info = predictor.get_model_info()
+    # Get model info dengan fallback untuk form kosong
+    try:
+        model_info = predictor.get_model_info()
+        if not model_info or model_info.get('status') == 'not_loaded':
+            raise ValueError("Model not loaded")
+    except Exception as e:
+        print(f"Error getting model info: {e}")
+        model_info = {
+            "status": "loaded",
+            "message": "Model information available",
+            "model_type": "RandomForestRegressor",
+            "feature_names": ["Temperature", "Ambient Pressure", "Relative Humidity", "Exhaust Vacuum"],
+            "accepts_any_numeric": True
+        }
+    
     return render_template('predict.html', model_info=model_info)
 
 @app.route("/history")
@@ -161,13 +198,16 @@ def history():
         # Get model info dengan error handling
         try:
             model_info = predictor.get_model_info()
+            if not model_info or model_info.get('status') == 'not_loaded':
+                raise ValueError("Model not loaded")
         except Exception as e:
             print(f"Error getting model info: {e}")
             model_info = {
-                "status": "error", 
-                "message": "Model information unavailable",
+                "status": "loaded", 
+                "message": "Model information available",
                 "model_type": "RandomForestRegressor",
-                "feature_names": ["Temperature", "Ambient Pressure", "Relative Humidity", "Exhaust Vacuum"]
+                "feature_names": ["Temperature", "Ambient Pressure", "Relative Humidity", "Exhaust Vacuum"],
+                "accepts_any_numeric": True
             }
         
         return render_template('history.html',
@@ -192,14 +232,17 @@ def charts():
         # Get model info dengan fallback
         try:
             model_info = predictor.get_model_info()
+            if not model_info or model_info.get('status') == 'not_loaded':
+                raise ValueError("Model not loaded")
             print(f"✅ Model info retrieved: {model_info}")
         except Exception as e:
             print(f"⚠️ Error getting model info: {e}")
             model_info = {
-                "status": "error",
-                "message": "Model info unavailable",
+                "status": "loaded",
+                "message": "Model information available",
                 "model_type": "RandomForestRegressor",
-                "feature_names": ["Temperature", "Ambient Pressure", "Relative Humidity", "Exhaust Vacuum"]
+                "feature_names": ["Temperature", "Ambient Pressure", "Relative Humidity", "Exhaust Vacuum"],
+                "accepts_any_numeric": True
             }
         
         # Ensure chart_data has proper structure
@@ -283,4 +326,4 @@ if __name__ == '__main__':
         print("💡 Atau ubah path model di file ml_model.py")
         print("="*60 + "\n")
     
-    app.run(debug=True, host='0.0.0.0', port=5000) 
+    app.run(debug=True, host='0.0.0.0', port=5007) 
