@@ -5,72 +5,94 @@
 {% block content %}
 <div class="row">
     <div class="col-lg-8">
-        <div class="card fade-in">
-            <div class="card-header">
-                <h4 class="mb-0">
-                    <i class="fas fa-brain me-2"></i>Power Output Prediction
-                </h4>
-                <p class="mb-0 mt-2">Enter the operating conditions to predict power output using Random Forest model</p>
+        <div class="glass-panel fade-in mb-4">
+            <div class="card-header border-bottom border-light border-opacity-10 py-3">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle p-2 bg-primary bg-opacity-10 me-3">
+                        <i class="fas fa-brain fa-lg text-primary"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-0 fw-bold text-white">Power Output Prediction</h4>
+                        <p class="mb-0 text-white-50 small">Enter operating parameters for AI analysis</p>
+                    </div>
+                </div>
             </div>
             <div class="card-body p-4">
-                <form method="POST" id="predictionForm">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="temperature" class="form-label fw-bold">
-                                <i class="fas fa-thermometer-half me-1" style="color: #e74c3c;"></i>
-                                Temperature (°C)
-                            </label>
-                            <input type="number" class="form-control form-control-lg" id="temperature" name="temperature" 
-                                   step="0.01" required
-                                   placeholder="e.g., 19.07">
-                            <div class="form-text">Masukkan nilai temperature dalam °C</div>
+                <form method="POST" id="predictionForm" class="needs-validation" novalidate>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="temperature" class="form-label d-flex align-items-center">
+                                    <i class="fas fa-thermometer-half me-2 text-danger"></i>
+                                    Temperature (°C)
+                                </label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control glass-input form-control-lg"
+                                        id="temperature" name="temperature" step="0.01" required placeholder="19.07">
+                                </div>
+                                <div class="form-text small opacity-75">Range: 2.0 - 37.0°C</div>
+                            </div>
                         </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <label for="ambient_pressure" class="form-label fw-bold">
-                                <i class="fas fa-tachometer-alt me-1" style="color: #3498db;"></i>
-                                Ambient Pressure (mbar)
-                            </label>
-                            <input type="number" class="form-control form-control-lg" id="ambient_pressure" name="ambient_pressure" 
-                                   step="0.01" required
-                                   placeholder="e.g., 1013.25">
-                            <div class="form-text">Masukkan nilai pressure dalam mbar</div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="ambient_pressure" class="form-label d-flex align-items-center">
+                                    <i class="fas fa-tachometer-alt me-2 text-primary"></i>
+                                    Ambient Pressure (mbar)
+                                </label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control glass-input form-control-lg"
+                                        id="ambient_pressure" name="ambient_pressure" step="0.01" required
+                                        placeholder="1013.25">
+                                </div>
+                                <div class="form-text small opacity-75">Range: 992 - 1033 mbar</div>
+                            </div>
                         </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <label for="relative_humidity" class="form-label fw-bold">
-                                <i class="fas fa-tint me-1" style="color: #1abc9c;"></i>
-                                Relative Humidity (%)
-                            </label>
-                            <input type="number" class="form-control form-control-lg" id="relative_humidity" name="relative_humidity" 
-                                   step="0.01" required
-                                   placeholder="e.g., 67.87">
-                            <div class="form-text">Masukkan nilai humidity dalam %</div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="relative_humidity" class="form-label d-flex align-items-center">
+                                    <i class="fas fa-tint me-2 text-info"></i>
+                                    Relative Humidity (%)
+                                </label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control glass-input form-control-lg"
+                                        id="relative_humidity" name="relative_humidity" step="0.01" required
+                                        placeholder="67.87">
+                                </div>
+                                <div class="form-text small opacity-75">Range: 25 - 100%</div>
+                            </div>
                         </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <label for="exhaust_vacuum" class="form-label fw-bold">
-                                <i class="fas fa-wind me-1" style="color: #9b59b6;"></i>
-                                Exhaust Vacuum (cm Hg)
-                            </label>
-                            <input type="number" class="form-control form-control-lg" id="exhaust_vacuum" name="exhaust_vacuum" 
-                                   step="0.01" required
-                                   placeholder="e.g., 54.30">
-                            <div class="form-text">Masukkan nilai vacuum dalam cm Hg</div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="exhaust_vacuum" class="form-label d-flex align-items-center">
+                                    <i class="fas fa-wind me-2 text-secondary"></i>
+                                    Exhaust Vacuum (cm Hg)
+                                </label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control glass-input form-control-lg"
+                                        id="exhaust_vacuum" name="exhaust_vacuum" step="0.01" required
+                                        placeholder="54.30">
+                                </div>
+                                <div class="form-text small opacity-75">Range: 25 - 81 cm Hg</div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="row mt-4">
+
+                    <div class="row mt-5">
                         <div class="col-12">
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <button type="button" class="btn btn-secondary btn-lg" onclick="fillSampleData()">
-                                    <i class="fas fa-magic me-2"></i>Fill Sample Data
+                            <div class="d-flex gap-3 justify-content-end">
+                                <button type="button" class="btn btn-modern-outline" onclick="fillSampleData()">
+                                    <i class="fas fa-magic me-2"></i>Auto-Fill
                                 </button>
-                                <button type="button" class="btn btn-warning btn-lg" onclick="clearForm()">
-                                    <i class="fas fa-trash me-2"></i>Clear Form
+                                <button type="button"
+                                    class="btn btn-modern-outline text-warning border-warning border-opacity-25"
+                                    onclick="clearForm()">
+                                    <i class="fas fa-trash me-2"></i>Clear
                                 </button>
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-brain me-2"></i>Predict Power Output
+                                <button type="submit" class="btn btn-modern-primary px-5">
+                                    <i class="fas fa-bolt me-2"></i>Predict Output
                                 </button>
                             </div>
                         </div>
@@ -78,337 +100,268 @@
                 </form>
             </div>
         </div>
+
+        {% if result %}
+        <div class="glass-panel fade-in border border-success border-opacity-50 position-relative overflow-hidden mb-4">
+            <div class="position-absolute top-0 start-0 w-100 h-100 bg-success bg-opacity-5"
+                style="pointer-events: none;"></div>
+            <div class="card-body p-4 position-relative z-1">
+                <div class="row align-items-center">
+                    <div class="col-lg-5 text-center border-end border-light border-opacity-10">
+                        <h6 class="text-uppercase text-muted fw-bold letter-spacing-1 mb-2">Predicted Output</h6>
+                        <div class="display-3 fw-bold text-white mb-2 float-animation">
+                            {{ result.predicted_power }}
+                        </div>
+                        <span class="fs-4 text-muted">MW</span>
+                    </div>
+
+                    <div class="col-lg-7 ps-lg-5 mt-4 mt-lg-0">
+                        <h6 class="fw-bold mb-3"><i class="fas fa-chart-bar me-2 text-primary"></i>Contributing Factors
+                        </h6>
+                        {% if result.feature_importance %}
+                        {% for feature, importance in result.feature_importance.items() %}
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <small class="text-dim">{{ feature }}</small>
+                                <small class="text-white">{{ (importance * 100)|round(1) }}%</small>
+                            </div>
+                            <div class="progress bg-white bg-opacity-10" style="height: 6px;">
+                                <div class="progress-bar bg-gradient-success"
+                                    style="width: {{ (importance * 100)|round(1) }}%"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row mt-4 pt-3 border-top border-light border-opacity-10">
+                    <div class="col-12 text-center">
+                        <small class="text-muted d-block mb-3">Analysis based on provided operational parameters</small>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{{ url_for('history') }}" class="btn btn-sm btn-modern-outline">
+                                <i class="fas fa-save me-1"></i> Saved to History
+                            </a>
+                            <a href="{{ url_for('charts') }}" class="btn btn-sm btn-modern-outline">
+                                <i class="fas fa-chart-line me-1"></i> View Analytics
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
     <div class="col-lg-4">
         <!-- Parameter Guide -->
-        <div class="card slide-in-right">
-            <div class="card-header">
-                <h6 class="mb-0">
-                    <i class="fas fa-info-circle me-2"></i>Parameter Guide
+        <div class="glass-panel slide-in-right mb-4">
+            <div class="card-header bg-transparent border-bottom border-light border-opacity-10 py-3">
+                <h6 class="mb-0 fw-bold text-white">
+                    <i class="fas fa-info-circle me-2 text-info"></i>Parameters Guide
                 </h6>
             </div>
-            <div class="card-body">
-                <div class="mb-3">
-                    <h6><i class="fas fa-thermometer-half text-danger me-1"></i> Temperature</h6>
-                    <small class="text-muted">Ambient air temperature in Celsius. Lower temperatures generally increase power output due to improved gas turbine efficiency.</small>
+            <div class="card-body p-4">
+                <div class="d-flex mb-4">
+                    <div class="me-3 mt-1"><i class="fas fa-thermometer-half text-danger"></i></div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-white">Temperature (T)</h6>
+                        <p class="small text-white-50 mb-0">Ambient temperature affects turbine efficiency. Lower is
+                            generally better.</p>
+                    </div>
                 </div>
-                
-                <div class="mb-3">
-                    <h6><i class="fas fa-tachometer-alt text-primary me-1"></i> Ambient Pressure</h6>
-                    <small class="text-muted">Atmospheric pressure in millibar. Higher pressure can improve turbine efficiency and power output.</small>
+                <div class="d-flex mb-4">
+                    <div class="me-3 mt-1"><i class="fas fa-tachometer-alt text-primary"></i></div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-white">Ambient Pressure (AP)</h6>
+                        <p class="small text-white-50 mb-0">Atmospheric pressure impacts air density and mass flow.</p>
+                    </div>
                 </div>
-                
-                <div class="mb-3">
-                    <h6><i class="fas fa-tint text-info me-1"></i> Relative Humidity</h6>
-                    <small class="text-muted">Air moisture content in percentage. Affects air density and cooling efficiency in the system.</small>
+                <div class="d-flex mb-4">
+                    <div class="me-3 mt-1"><i class="fas fa-tint text-info"></i></div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-white">Relative Humidity (RH)</h6>
+                        <p class="small text-white-50 mb-0">Moisture content in the air. High humidity can reduce
+                            efficiency.</p>
+                    </div>
                 </div>
-                
-                <div class="mb-3">
-                    <h6><i class="fas fa-wind text-purple me-1"></i> Exhaust Vacuum</h6>
-                    <small class="text-muted">Vacuum level in the steam condenser in cm Hg. Higher vacuum improves steam cycle efficiency.</small>
+                <div class="d-flex">
+                    <div class="me-3 mt-1"><i class="fas fa-wind text-secondary"></i></div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-white">Exhaust Vacuum (V)</h6>
+                        <p class="small text-white-50 mb-0">Condenser vacuum level. Critical for steam cycle efficiency.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Typical Operating Values -->
-        <div class="card mt-3 slide-in-right" style="animation-delay: 0.2s;">
-            <div class="card-header">
-                <h6 class="mb-0">
-                    <i class="fas fa-flask me-2"></i>Typical Operating Values
+        <div class="glass-panel slide-in-right" style="animation-delay: 0.2s;">
+            <div class="card-header bg-transparent border-bottom border-light border-opacity-10 py-3">
+                <h6 class="mb-0 fw-bold">
+                    <i class="fas fa-check-circle me-2 text-success"></i>Optimal Ranges
                 </h6>
-            </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-6 mb-3">
-                        <div class="badge" style="background: var(--gradient-primary); padding: 0.5rem 1rem;">
-                            <strong>Temperature</strong><br>
-                            <small>15 - 25°C</small>
-                        </div>
-                    </div>
-                    <div class="col-6 mb-3">
-                        <div class="badge" style="background: var(--gradient-success); padding: 0.5rem 1rem;">
-                            <strong>Pressure</strong><br>
-                            <small>1010 - 1020 mbar</small>
-                        </div>
-                    </div>
-                    <div class="col-6 mb-3">
-                        <div class="badge" style="background: var(--gradient-secondary); padding: 0.5rem 1rem;">
-                            <strong>Humidity</strong><br>
-                            <small>50 - 80%</small>
-                        </div>
-                    </div>
-                    <div class="col-6 mb-3">
-                        <div class="badge" style="background: linear-gradient(135deg, #f093fb, #f5576c); padding: 0.5rem 1rem;">
-                            <strong>Vacuum</strong><br>
-                            <small>40 - 70 cm Hg</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {% if model_info.status == 'loaded' %}
-        <!-- Model Status -->
-        <div class="card mt-3 slide-in-right" style="animation-delay: 0.4s;">
-            <div class="card-header">
-                <h6 class="mb-0">
-                    <i class="fas fa-robot me-2"></i>Model Status
-                </h6>
-            </div>
-            <div class="card-body">
-                <div class="text-success mb-2">
-                    <i class="fas fa-check-circle me-1"></i>
-                    <strong>Model Ready</strong>
-                </div>
-                <div class="mb-2">
-                    <small><strong>Type:</strong> {{ model_info.model_type }}</small>
-                </div>
-                {% if model_info.n_estimators %}
-                <div class="mb-2">
-                    <small><strong>Trees:</strong> {{ model_info.n_estimators }}</small>
-                </div>
-                {% endif %}
-                <div class="text-muted">
-                    <small>Your Random Forest model is loaded and ready for predictions!</small>
-                </div>
-            </div>
-        </div>
-        {% else %}
-        <div class="card mt-3 slide-in-right" style="animation-delay: 0.4s;">
-            <div class="card-body">
-                <div class="text-danger">
-                    <i class="fas fa-exclamation-triangle me-1"></i>
-                    <strong>Model Not Available</strong>
-                </div>
-                <p class="mb-0">Please ensure random_forest_model.pkl file is available.</p>
-            </div>
-        </div>
-        {% endif %}
-    </div>
-</div>
-
-{% if result %}
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="card fade-in">
-            <div class="card-header" style="background: var(--gradient-success);">
-                <h5 class="mb-0">
-                    <i class="fas fa-check-circle me-2"></i>Prediction Result
-                </h5>
             </div>
             <div class="card-body p-4">
-                <div class="row">
-                    <div class="col-lg-4 mb-4">
-                        <div class="prediction-result">
-                            <h5 class="mb-2">
-                                <i class="fas fa-bolt me-2"></i>Predicted Power Output
-                            </h5>
-                            <div class="prediction-value">
-                                {{ result.predicted_power }} MW
-                            </div>
-                            <p class="mb-0 opacity-75">Based on your input parameters</p>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="p-2 rounded bg-white text-center">
+                            <small class="d-block text-dark mb-1">Avg Temp</small>
+                            <span class="fw-bold text-dark">~20°C</span>
                         </div>
                     </div>
-                    
-                    <div class="col-lg-4 mb-4">
-                        <div class="card h-100">
-                            <div class="card-header">
-                                <h6 class="mb-0"><i class="fas fa-list me-1"></i> Input Parameters</h6>
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-unstyled mb-0">
-                                    <li class="mb-2">
-                                        <i class="fas fa-thermometer-half text-danger me-2"></i>
-                                        <strong>Temperature:</strong> {{ "%.2f"|format(result.input_values.temperature) }}°C
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="fas fa-tachometer-alt text-primary me-2"></i>
-                                        <strong>Pressure:</strong> {{ "%.2f"|format(result.input_values.ambient_pressure) }} mbar
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="fas fa-tint text-info me-2"></i>
-                                        <strong>Humidity:</strong> {{ "%.2f"|format(result.input_values.relative_humidity) }}%
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="fas fa-wind text-purple me-2"></i>
-                                        <strong>Vacuum:</strong> {{ "%.2f"|format(result.input_values.exhaust_vacuum) }} cm Hg
-                                    </li>
-                                </ul>
-                            </div>
+                    <div class="col-6">
+                        <div class="p-2 rounded bg-white text-center">
+                            <small class="d-block text-dark mb-1">Avg Pressure</small>
+                            <span class="fw-bold text-dark">1013 mb</span>
                         </div>
                     </div>
-                    
-                    {% if result.feature_importance %}
-                    <div class="col-lg-4 mb-4">
-                        <div class="card h-100">
-                            <div class="card-header">
-                                <h6 class="mb-0"><i class="fas fa-chart-bar me-1"></i> Feature Importance</h6>
-                            </div>
-                            <div class="card-body">
-                                {% for feature, importance in result.feature_importance.items() %}
-                                <div class="mb-3">
-                                    <div class="d-flex justify-content-between">
-                                        <small class="fw-bold">{{ feature }}</small>
-                                        <small class="text-muted">{{ (importance * 100)|round(1) }}%</small>
-                                    </div>
-                                    <div class="progress" style="height: 8px;">
-                                        <div class="progress-bar" style="width: {{ (importance * 100)|round(1) }}%"></div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
+                    <div class="col-6">
+                        <div class="p-2 rounded bg-white text-center">
+                            <small class="d-block text-dark mb-1">Avg Humidity</small>
+                            <span class="fw-bold text-dark">73%</span>
                         </div>
                     </div>
-                    {% endif %}
-                </div>
-                
-                <div class="row mt-4">
-                    <div class="col-12 text-center">
-                        <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg me-2">
-                            <i class="fas fa-redo me-2"></i>Make Another Prediction
-                        </a>
-                        <a href="{{ url_for('history') }}" class="btn btn-success btn-lg me-2">
-                            <i class="fas fa-history me-2"></i>View History
-                        </a>
-                        <a href="{{ url_for('charts') }}" class="btn btn-warning btn-lg">
-                            <i class="fas fa-chart-line me-2"></i>View Charts
-                        </a>
+                    <div class="col-6">
+                        <div class="p-2 rounded bg-white text-center">
+                            <small class="d-block text-dark mb-1">Avg Vacuum</small>
+                            <span class="fw-bold text-dark">54 cm</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endif %}
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
-function fillSampleData() {
-    document.getElementById('temperature').value = '19.07';
-    document.getElementById('ambient_pressure').value = '1013.25';
-    document.getElementById('relative_humidity').value = '67.87';
-    document.getElementById('exhaust_vacuum').value = '54.30';
-}
+    function fillSampleData() {
+        document.getElementById('temperature').value = '19.07';
+        document.getElementById('ambient_pressure').value = '1013.25';
+        document.getElementById('relative_humidity').value = '67.87';
+        document.getElementById('exhaust_vacuum').value = '54.30';
+    }
 
-function clearForm() {
-    document.getElementById('predictionForm').reset();
-}
+    function clearForm() {
+        document.getElementById('predictionForm').reset();
+    }
 
-// Real-time input validation
-document.querySelectorAll('input[type="number"]').forEach(input => {
-    input.addEventListener('input', function() {
-        validateInput(this);
+    // Real-time input validation
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+        input.addEventListener('input', function () {
+            validateInput(this);
+        });
+
+        input.addEventListener('blur', function () {
+            validateInput(this);
+        });
     });
-    
-    input.addEventListener('blur', function() {
-        validateInput(this);
-    });
-});
 
-function validateInput(input) {
-    const min = parseFloat(input.min);
-    const max = parseFloat(input.max);
-    const value = parseFloat(input.value);
-    
-    input.classList.remove('is-valid', 'is-invalid');
-    
-    if (isNaN(value)) {
-        return;
-    }
-    
-    if (value < min || value > max) {
-        input.classList.add('is-invalid');
-        showInputError(input, `Value must be between ${min} and ${max}`);
-    } else {
-        input.classList.add('is-valid');
-        hideInputError(input);
-    }
-}
-
-function showInputError(input, message) {
-    let errorDiv = input.parentNode.querySelector('.invalid-feedback');
-    if (!errorDiv) {
-        errorDiv = document.createElement('div');
-        errorDiv.className = 'invalid-feedback';
-        input.parentNode.appendChild(errorDiv);
-    }
-    errorDiv.textContent = message;
-}
-
-function hideInputError(input) {
-    const errorDiv = input.parentNode.querySelector('.invalid-feedback');
-    if (errorDiv) {
-        errorDiv.remove();
-    }
-}
-
-// Form submission validation
-document.getElementById('predictionForm').addEventListener('submit', function(e) {
-    const inputs = this.querySelectorAll('input[type="number"]');
-    let isValid = true;
-    
-    inputs.forEach(input => {
+    function validateInput(input) {
         const min = parseFloat(input.min);
         const max = parseFloat(input.max);
         const value = parseFloat(input.value);
-        
-        if (isNaN(value) || value < min || value > max) {
-            isValid = false;
-            input.classList.add('is-invalid');
+
+        input.classList.remove('is-valid', 'is-invalid');
+
+        if (isNaN(value)) {
+            return;
         }
-    });
-    
-    if (!isValid) {
-        e.preventDefault();
-        alert('Please check your input values. All parameters must be within the specified ranges.');
-        return;
-    }
-    
-    // Show loading state
-    const submitBtn = this.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Predicting...';
-    submitBtn.disabled = true;
-    
-    // Re-enable button after a delay (in case of form errors)
-    setTimeout(() => {
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    }, 5000);
-});
 
-// Add some visual enhancements
-document.addEventListener('DOMContentLoaded', function() {
-    // Add pulse effect to prediction result if it exists
-    const predictionResult = document.querySelector('.prediction-result');
-    if (predictionResult) {
-        predictionResult.style.animation = 'pulse 2s infinite';
+        if (value < min || value > max) {
+            input.classList.add('is-invalid');
+            showInputError(input, `Value must be between ${min} and ${max}`);
+        } else {
+            input.classList.add('is-valid');
+            hideInputError(input);
+        }
     }
-    
-    // Add hover effects to input fields
-    document.querySelectorAll('.form-control').forEach(input => {
-        input.addEventListener('focus', function() {
-            this.style.transform = 'translateY(-2px)';
-            this.style.boxShadow = '0 8px 25px rgba(52, 152, 219, 0.15)';
+
+    function showInputError(input, message) {
+        let errorDiv = input.parentNode.querySelector('.invalid-feedback');
+        if (!errorDiv) {
+            errorDiv = document.createElement('div');
+            errorDiv.className = 'invalid-feedback';
+            input.parentNode.appendChild(errorDiv);
+        }
+        errorDiv.textContent = message;
+    }
+
+    function hideInputError(input) {
+        const errorDiv = input.parentNode.querySelector('.invalid-feedback');
+        if (errorDiv) {
+            errorDiv.remove();
+        }
+    }
+
+    // Form submission validation
+    document.getElementById('predictionForm').addEventListener('submit', function (e) {
+        const inputs = this.querySelectorAll('input[type="number"]');
+        let isValid = true;
+
+        inputs.forEach(input => {
+            const min = parseFloat(input.min);
+            const max = parseFloat(input.max);
+            const value = parseFloat(input.value);
+
+            if (isNaN(value) || value < min || value > max) {
+                isValid = false;
+                input.classList.add('is-invalid');
+            }
         });
-        
-        input.addEventListener('blur', function() {
-            this.style.transform = 'translateY(0)';
-            this.style.boxShadow = '';
+
+        if (!isValid) {
+            e.preventDefault();
+            alert('Please check your input values. All parameters must be within the specified ranges.');
+            return;
+        }
+
+        // Show loading state
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Predicting...';
+        submitBtn.disabled = true;
+
+        // Re-enable button after a delay (in case of form errors)
+        setTimeout(() => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }, 5000);
+    });
+
+    // Add some visual enhancements
+    document.addEventListener('DOMContentLoaded', function () {
+        // Add pulse effect to prediction result if it exists
+        const predictionResult = document.querySelector('.prediction-result');
+        if (predictionResult) {
+            predictionResult.style.animation = 'pulse 2s infinite';
+        }
+
+        // Add hover effects to input fields
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('focus', function () {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 8px 25px rgba(52, 152, 219, 0.15)';
+            });
+
+            input.addEventListener('blur', function () {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '';
+            });
         });
     });
-});
 
-// Add pulse animation for prediction result
-const style = document.createElement('style');
-style.textContent = `
+    // Add pulse animation for prediction result
+    const style = document.createElement('style');
+    style.textContent = `
     @keyframes pulse {
         0%, 100% { transform: scale(1); }
         50% { transform: scale(1.05); }
     }
 `;
-document.head.appendChild(style);
+    document.head.appendChild(style);
 </script>
 {% endblock %}

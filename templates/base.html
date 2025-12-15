@@ -1,459 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Combined Cycle Power Plant Predictor{% endblock %}</title>
-    
+
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --accent-color: #e74c3c;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --light-bg: #f8f9fa;
-            --dark-bg: #34495e;
-            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
 
-        body {
-            background: var(--gradient-primary);
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .navbar {
-            background: rgba(44, 62, 80, 0.95) !important;
-            backdrop-filter: blur(15px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .navbar-brand {
-            font-weight: 700;
-            color: white !important;
-            font-size: 1.5rem;
-        }
-
-        .nav-link {
-            color: rgba(255,255,255,0.9) !important;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            padding: 0.75rem 1rem !important;
-            border-radius: 8px;
-            margin: 0 0.2rem;
-        }
-
-        .nav-link:hover {
-            color: white !important;
-            background: rgba(255,255,255,0.1);
-            transform: translateY(-2px);
-        }
-
-        .nav-link.active {
-            background: var(--secondary-color) !important;
-            color: white !important;
-        }
-
-        .main-content {
-            padding: 2rem 0;
-            min-height: calc(100vh - 120px);
-        }
-
-        .card {
-            border: none;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(15px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            overflow: hidden;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
-        }
-
-        .card-header {
-            background: var(--gradient-primary);
-            color: white;
-            border: none;
-            padding: 1.5rem 2rem;
-            border-radius: 20px 20px 0 0 !important;
-        }
-
-        .card-header h4, .card-header h5, .card-header h6 {
-            margin: 0;
-            font-weight: 600;
-        }
-
-        .btn-primary {
-            background: var(--gradient-primary);
-            border: none;
-            border-radius: 15px;
-            padding: 0.75rem 2rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-        }
-
-        .btn-primary:hover {
-            background: var(--gradient-secondary);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
-        }
-
-        .btn-success {
-            background: var(--gradient-success);
-            border: none;
-            border-radius: 15px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, #f39c12, #e67e22);
-            border: none;
-            border-radius: 15px;
-            font-weight: 600;
-            color: white;
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            border: none;
-            border-radius: 15px;
-            font-weight: 600;
-        }
-
-        .form-control {
-            border-radius: 12px;
-            border: 2px solid #e9ecef;
-            padding: 0.75rem 1rem;
-            transition: all 0.3s ease;
-            background: rgba(255,255,255,0.9);
-        }
-
-        .form-control:focus {
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
-            transform: translateY(-2px);
-            background: white;
-        }
-
-        .alert {
-            border: none;
-            border-radius: 15px;
-            padding: 1rem 1.5rem;
-            font-weight: 500;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .table {
-            border-radius: 15px;
-            overflow: hidden;
-            background: white;
-        }
-
-        .table thead th {
-            background: var(--gradient-primary);
-            color: white;
-            border: none;
-            font-weight: 600;
-            padding: 1rem;
-        }
-
-        .table td {
-            padding: 1rem;
-            vertical-align: middle;
-            border-color: #f8f9fa;
-        }
-
-        .stats-card {
-            background: var(--gradient-primary);
-            color: white;
-            border-radius: 20px;
-            padding: 2rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            text-decoration: none;
-            display: block;
-        }
-
-        .stats-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            color: white;
-            text-decoration: none;
-        }
-
-        /* Chart Container Styles */
-        .chart-container {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-            position: relative;
-            min-height: 450px;
-            height: auto;
-            overflow: visible;
-        }
-
-        .chart-container .chart-wrapper {
-            position: relative;
-            height: 380px;
-            width: 100%;
-        }
-
-        .chart-container canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100% !important;
-            height: 100% !important;
-            max-height: none !important;
-        }
-
-        /* Small charts for distribution and scatter */
-        .chart-container.small {
-            min-height: 350px;
-        }
-
-        .chart-container.small .chart-wrapper {
-            height: 280px;
-        }
-
-        /* Additional spacing for chart titles */
-        .chart-container h5 {
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #f8f9fa;
-        }
-
-        .stats-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .stats-text {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .prediction-result {
-            background: var(--gradient-success);
-            color: white;
-            border-radius: 20px;
-            padding: 2rem;
-            text-align: center;
-            margin: 2rem 0;
-        }
-
-        .prediction-value {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin: 1rem 0;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-
-        .feature-importance {
-            background: rgba(255,255,255,0.2);
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .progress {
-            height: 10px;
-            border-radius: 10px;
-            background: rgba(255,255,255,0.3);
-        }
-
-        .progress-bar {
-            background: linear-gradient(90deg, #4facfe, #00f2fe);
-            border-radius: 10px;
-        }
-
-        .chart-container {
-            background: rgba(255,255,255,0.98);
-            border-radius: 20px;
-            padding: 2rem;
-            margin: 1.5rem 0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .footer {
-            background: rgba(44, 62, 80, 0.95);
-            color: white;
-            text-align: center;
-            padding: 2rem 0;
-            margin-top: 3rem;
-            backdrop-filter: blur(15px);
-        }
-
-        /* Animations */
-        .fade-in {
-            animation: fadeIn 0.8s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { 
-                opacity: 0; 
-                transform: translateY(30px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0); 
-            }
-        }
-
-        .slide-in-right {
-            animation: slideInRight 1s ease-out;
-        }
-
-        @keyframes slideInRight {
-            from { 
-                opacity: 0; 
-                transform: translateX(50px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateX(0); 
-            }
-        }
-
-        .scale-in {
-            animation: scaleIn 0.6s ease-out;
-        }
-
-        @keyframes scaleIn {
-            from { 
-                opacity: 0; 
-                transform: scale(0.8); 
-            }
-            to { 
-                opacity: 1; 
-                transform: scale(1); 
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .navbar-brand {
-                font-size: 1.2rem;
-            }
-            .stats-number {
-                font-size: 2rem;
-            }
-            .prediction-value {
-                font-size: 2.5rem;
-            }
-        }
-    </style>
+    <!-- Custom Modern CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
     {% block extra_head %}{% endblock %}
 </head>
+
 <body>
     {% if 'user_id' in session %}
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
-                <i class="fas fa-bolt me-2"></i>Power Plant Predictor
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('dashboard') }}">
-                            <i class="fas fa-home me-1"></i>Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('predict') }}">
-                            <i class="fas fa-brain me-1"></i>Predict
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('history') }}">
-                            <i class="fas fa-history me-1"></i>History
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('charts') }}">
-                            <i class="fas fa-chart-line me-1"></i>Charts
-                        </a>
-                    </li>
-                </ul>
-                
-                <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user me-1"></i>{{ session.username }}
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ url_for('logout') }}">
-                                <i class="fas fa-sign-out-alt me-1"></i>Logout
-                            </a></li>
-                        </ul>
-                    </li>
-                </ul>
+    <!-- Mobile Header -->
+    <div class="mobile-header d-lg-none">
+        <button class="btn btn-link text-white p-0 me-3" type="button" data-bs-toggle="offcanvas"
+            data-bs-target="#sidebarMenu">
+            <i class="fas fa-bars fa-lg"></i>
+        </button>
+        <span class="h5 mb-0 fw-bold">Power Plant Predictor</span>
+    </div>
+
+    <!-- Sidebar -->
+    <nav class="sidebar d-flex flex-column flex-shrink-0" id="sidebarMenu">
+        <a href="{{ url_for('dashboard') }}" class="sidebar-brand">
+            <i class="fas fa-bolt text-warning"></i>
+            <span>Power Plant</span>
+        </a>
+
+        <div class="d-flex flex-column flex-grow-1">
+            <ul class="nav flex-column mb-auto">
+                <li class="nav-item">
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('predict') }}" class="nav-link">
+                        <i class="fas fa-brain"></i>
+                        Predict
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('history') }}" class="nav-link">
+                        <i class="fas fa-history"></i>
+                        History
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('charts') }}" class="nav-link">
+                        <i class="fas fa-chart-line"></i>
+                        Charts
+                    </a>
+                </li>
+            </ul>
+
+            <div class="user-profile mt-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white me-3"
+                        style="width: 40px; height: 40px;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <div class="fw-bold text-truncate">{{ session.username }}</div>
+                        <div class="small text-muted">Online</div>
+                    </div>
+                </div>
+                <a href="{{ url_for('logout') }}" class="btn btn-modern-outline btn-sm w-100">
+                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </a>
             </div>
         </div>
     </nav>
     {% endif %}
 
-    <main class="main-content" style="{% if 'user_id' in session %}margin-top: 80px;{% endif %}">
+    <main class="main-content">
         <div class="container">
             <!-- Flash Messages -->
             {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show fade-in" role="alert">
-                            <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show fade-in"
+                role="alert">
+                <i
+                    class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
             {% endwith %}
 
             {% block content %}{% endblock %}
         </div>
     </main>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-8">
-                    <p class="mb-1">
-                        <i class="fas fa-bolt me-2"></i>
+    <footer class="footer mt-auto py-3 glass-panel mx-3 mb-3">
+        <div class="container text-center">
+            <div class="row align-items-center">
+                <div class="col-md-8 text-md-start">
+                    <p class="mb-1 text-gradient fw-bold">
+                        <i class="fas fa-bolt me-2 text-warning"></i>
                         Combined Cycle Power Plant Predictor
                     </p>
-                    <p class="mb-0">
-                        <small>Powered by Random Forest Machine Learning</small>
+                    <p class="mb-0 text-muted small">
+                        Powered by <span class="text-white">Random Forest Machine Learning</span>
                     </p>
                 </div>
                 <div class="col-md-4 text-md-end">
-                    <p class="mb-0">
-                        <small>&copy; 2025 - Data Mining Project</small>
+                    <p class="mb-0 text-muted small">
+                        &copy; 2025 - Data Mining Project
                     </p>
                 </div>
             </div>
@@ -462,21 +128,22 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
         // Add active class to current nav item
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const currentLocation = location.pathname;
             const menuItems = document.querySelectorAll('.nav-link');
-            
+
             menuItems.forEach(item => {
-                if(item.getAttribute('href') === currentLocation){
+                if (item.getAttribute('href') === currentLocation) {
                     item.classList.add('active');
                 }
             });
         });
     </script>
-    
+
     {% block extra_scripts %}{% endblock %}
 </body>
+
 </html>

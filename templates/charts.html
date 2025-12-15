@@ -49,67 +49,73 @@
                 </h5>
 
 
-{% block extra_scripts %}
-<script>
-// Parse chart data from server
-let chartData;
-try {
-    chartData = {{ chart_data|safe }};
-    console.log('Chart data loaded:', chartData);
-    console.log('Data lengths:', {
-        power: chartData.power ? chartData.power.length : 0,
-        temperature: chartData.temperature ? chartData.temperature.length : 0,
-        pressure: chartData.pressure ? chartData.pressure.length : 0,
-        humidity: chartData.humidity ? chartData.humidity.length : 0,
-        vacuum: chartData.vacuum ? chartData.vacuum.length : 0
-    });
+                {% block extra_scripts %}
+                <script>
+                    // Parse chart data from server
+                    let chartData;
+                    try {
+                        chartData = {{ chart_data | safe }};
+                    console.log('Chart data loaded:', chartData);
+                    console.log('Data lengths:', {
+                        power: chartData.power ? chartData.power.length : 0,
+                        temperature: chartData.temperature ? chartData.temperature.length : 0,
+                        pressure: chartData.pressure ? chartData.pressure.length : 0,
+                        humidity: chartData.humidity ? chartData.humidity.length : 0,
+                        vacuum: chartData.vacuum ? chartData.vacuum.length : 0
+                    });
 } catch (e) {
-    console.error('Error parsing chart data:', e);
-    chartData = { power: [], dates: [], temperature: [], pressure: [], humidity: [], vacuum: [] };
-}
+                        console.error('Error parsing chart data:', e);
+                        chartData = { power: [], dates: [], temperature: [], pressure: [], humidity: [], vacuum: [] };
+                    }
 
-const charts = {};
+                    const charts = {};
 
-// Initialize page when loaded
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM Content Loaded - initializing charts');
-    
-    if (chartData && chartData.power && chartData.power.length > 0) {
-        console.log('Chart data available - initializing all charts');
-        initializeChartsContent();
-        initializePowerTrendChart();
-        initializeParametersChart();
-        initializePowerDistributionChart();
-        initializeScatterCharts();
-        initializeCorrelationChart();
-        updateQuickStats();
-    } else {
-        console.log('No chart data - showing charts with sample/no data state');
-        initializeChartsContent();
-        // Initialize correlation chart anyway to show structure
-        setTimeout(() => {
-            initializeCorrelationChart();
-        }, 500);
-        // Show no data state for other charts
-        document.getElementById('noDataState').style.display = 'block';
-    }
-});
+                    // Initialize page when loaded
+                    document.addEventListener('DOMContentLoaded', function () {
+                        console.log('DOM Content Loaded - initializing charts');
 
-function initializeChartsContent() {
-    document.getElementById('chartContent').innerHTML = `
+                        // Global Chart.js defaults for dark theme
+                        Chart.defaults.color = '#94a3b8';
+                        Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+                        Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.05)';
+
+                        if (chartData && chartData.power && chartData.power.length > 0) {
+                            console.log('Chart data available - initializing all charts');
+                            initializeChartsContent();
+                            initializePowerTrendChart();
+                            initializeParametersChart();
+                            initializePowerDistributionChart();
+                            initializeScatterCharts();
+                            initializeCorrelationChart();
+                            updateQuickStats();
+                        } else {
+                            console.log('No chart data - showing charts with sample/no data state');
+                            initializeChartsContent();
+                            // Initialize correlation chart anyway to show structure
+                            setTimeout(() => {
+                                initializeCorrelationChart();
+                            }, 500);
+                            // Show no data state for other charts
+                            document.getElementById('noDataState').style.display = 'block';
+                            document.getElementById('chartContent').style.display = 'none';
+                        }
+                    });
+
+                    function initializeChartsContent() {
+                        document.getElementById('chartContent').innerHTML = `
         <div class="row">
             <!-- Main Power Trend Chart -->
             <div class="col-lg-8 mb-4">
-                <div class="chart-container slide-in-right">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">
-                            <i class="fas fa-bolt me-2"></i>Power Output Trend
+                <div class="glass-panel p-4 h-100 slide-in-right">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-bolt me-2 text-warning"></i>Power Output Trend
                         </h5>
-                        <button class="btn btn-sm btn-outline-primary" onclick="downloadChart('powerTrendChart')">
+                        <button class="btn btn-sm btn-modern-outline" onclick="downloadChart('powerTrendChart')">
                             <i class="fas fa-download me-1"></i>Download
                         </button>
                     </div>
-                    <div class="chart-wrapper">
+                    <div class="chart-wrapper" style="height: 300px;">
                         <canvas id="powerTrendChart"></canvas>
                     </div>
                 </div>
@@ -117,9 +123,9 @@ function initializeChartsContent() {
 
             <!-- Quick Statistics -->
             <div class="col-lg-4 mb-4">
-                <div class="chart-container small slide-in-right" style="animation-delay: 0.1s;">
-                    <h5 class="mb-3">
-                        <i class="fas fa-calculator me-2"></i>Quick Statistics
+                <div class="glass-panel p-4 h-100 slide-in-right" style="animation-delay: 0.1s;">
+                    <h5 class="mb-4 fw-bold">
+                        <i class="fas fa-calculator me-2 text-info"></i>Quick Statistics
                     </h5>
                     <div id="quickStats">
                         <!-- Will be populated by JavaScript -->
@@ -131,16 +137,16 @@ function initializeChartsContent() {
         <div class="row">
             <!-- Parameters Chart -->
             <div class="col-lg-8 mb-4">
-                <div class="chart-container slide-in-right" style="animation-delay: 0.2s;">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">
-                            <i class="fas fa-layer-group me-2"></i>Input Parameters Over Time
+                <div class="glass-panel p-4 h-100 slide-in-right" style="animation-delay: 0.2s;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-layer-group me-2 text-primary"></i>Input Parameters Over Time
                         </h5>
-                        <button class="btn btn-sm btn-outline-success" onclick="downloadChart('parametersChart')">
+                        <button class="btn btn-sm btn-modern-outline" onclick="downloadChart('parametersChart')">
                             <i class="fas fa-download me-1"></i>Download
                         </button>
                     </div>
-                    <div class="chart-wrapper">
+                    <div class="chart-wrapper" style="height: 300px;">
                         <canvas id="parametersChart"></canvas>
                     </div>
                 </div>
@@ -148,16 +154,16 @@ function initializeChartsContent() {
 
             <!-- Power Distribution -->
             <div class="col-lg-4 mb-4">
-                <div class="chart-container small slide-in-right" style="animation-delay: 0.3s;">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">
-                            <i class="fas fa-chart-pie me-2"></i>Power Distribution
+                <div class="glass-panel p-4 h-100 slide-in-right" style="animation-delay: 0.3s;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-chart-pie me-2 text-success"></i>Distribution
                         </h5>
-                        <button class="btn btn-sm btn-outline-warning" onclick="downloadChart('powerDistributionChart')">
+                        <button class="btn btn-sm btn-modern-outline" onclick="downloadChart('powerDistributionChart')">
                             <i class="fas fa-download me-1"></i>Download
                         </button>
                     </div>
-                    <div class="chart-wrapper">
+                    <div class="chart-wrapper" style="height: 300px;">
                         <canvas id="powerDistributionChart"></canvas>
                     </div>
                 </div>
@@ -167,32 +173,32 @@ function initializeChartsContent() {
         <!-- Scatter Plots -->
         <div class="row">
             <div class="col-lg-6 mb-4">
-                <div class="chart-container small fade-in" style="animation-delay: 0.4s;">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">
+                <div class="glass-panel p-4 fade-in" style="animation-delay: 0.4s;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0 fw-bold">
                             <i class="fas fa-thermometer-half me-2 text-danger"></i>Temperature vs Power
                         </h5>
-                        <button class="btn btn-sm btn-outline-danger" onclick="downloadChart('tempScatterChart')">
+                        <button class="btn btn-sm btn-modern-outline" onclick="downloadChart('tempScatterChart')">
                             <i class="fas fa-download me-1"></i>Download
                         </button>
                     </div>
-                    <div class="chart-wrapper">
+                    <div class="chart-wrapper" style="height: 300px;">
                         <canvas id="tempScatterChart"></canvas>
                     </div>
                 </div>
             </div>
 
             <div class="col-lg-6 mb-4">
-                <div class="chart-container small fade-in" style="animation-delay: 0.5s;">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">
+                <div class="glass-panel p-4 fade-in" style="animation-delay: 0.5s;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0 fw-bold">
                             <i class="fas fa-tachometer-alt me-2 text-info"></i>Pressure vs Power
                         </h5>
-                        <button class="btn btn-sm btn-outline-info" onclick="downloadChart('pressureScatterChart')">
+                        <button class="btn btn-sm btn-modern-outline" onclick="downloadChart('pressureScatterChart')">
                             <i class="fas fa-download me-1"></i>Download
                         </button>
                     </div>
-                    <div class="chart-wrapper">
+                    <div class="chart-wrapper" style="height: 300px;">
                         <canvas id="pressureScatterChart"></canvas>
                     </div>
                 </div>
@@ -202,16 +208,16 @@ function initializeChartsContent() {
         <!-- Correlation Analysis -->
         <div class="row">
             <div class="col-lg-8 mb-4">
-                <div class="chart-container slide-in-right" style="animation-delay: 0.6s;">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">
-                            <i class="fas fa-project-diagram me-2"></i>Parameter Correlation with Power
+                <div class="glass-panel p-4 h-100 slide-in-right" style="animation-delay: 0.6s;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-project-diagram me-2 text-secondary"></i>Parameter Correlation
                         </h5>
-                        <button class="btn btn-sm btn-outline-info" onclick="downloadChart('correlationChart')">
+                        <button class="btn btn-sm btn-modern-outline" onclick="downloadChart('correlationChart')">
                             <i class="fas fa-download me-1"></i>Download
                         </button>
                     </div>
-                    <div class="chart-wrapper">
+                    <div class="chart-wrapper" style="height: 300px;">
                         <canvas id="correlationChart"></canvas>
                     </div>
                 </div>
@@ -219,22 +225,22 @@ function initializeChartsContent() {
 
             <!-- Export All Options -->
             <div class="col-lg-4 mb-4">
-                <div class="card fade-in" style="animation-delay: 0.7s;">
-                    <div class="card-header">
-                        <h6 class="mb-0">
-                            <i class="fas fa-download me-2"></i>Export Options
+                <div class="glass-panel p-4 h-100 fade-in" style="animation-delay: 0.7s;">
+                    <div class="card-header bg-transparent border-bottom border-light border-opacity-10 pb-3 mb-3">
+                        <h6 class="mb-0 fw-bold">
+                            <i class="fas fa-file-export me-2 text-white"></i>Export Options
                         </h6>
                     </div>
                     <div class="card-body">
-                        <div class="d-grid gap-2">
-                            <button class="btn btn-primary" onclick="downloadAllCharts()">
+                        <div class="d-grid gap-3">
+                            <button class="btn btn-modern-primary" onclick="downloadAllCharts()">
                                 <i class="fas fa-images me-2"></i>Download All Charts
                             </button>
-                            <button class="btn btn-success" onclick="generateReport()">
-                                <i class="fas fa-file-pdf me-2"></i>Generate Report
+                            <button class="btn btn-modern-outline" onclick="generateReport()">
+                                <i class="fas fa-file-pdf me-2"></i>Generate PDF Report
                             </button>
-                            <button class="btn btn-info" onclick="shareCharts()">
-                                <i class="fas fa-share me-2"></i>Share Analytics
+                            <button class="btn btn-modern-outline" onclick="shareCharts()">
+                                <i class="fas fa-share-alt me-2"></i>Share Analytics
                             </button>
                         </div>
                     </div>
@@ -242,613 +248,613 @@ function initializeChartsContent() {
             </div>
         </div>
     `;
-}
+                    }
 
-function initializePowerTrendChart() {
-    const ctx = document.getElementById('powerTrendChart').getContext('2d');
-    
-    charts.powerTrendChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: chartData.dates,
-            datasets: [{
-                label: 'Power Output (MW)',
-                data: chartData.power,
-                borderColor: 'rgba(52, 152, 219, 1)',
-                backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                borderWidth: 3,
-                tension: 0.4,
-                fill: true,
-                pointBackgroundColor: 'rgba(52, 152, 219, 1)',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointRadius: 6,
-                pointHoverRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            layout: {
-                padding: {
-                    top: 20,
-                    right: 20,
-                    bottom: 30,
-                    left: 20
-                }
-            },
-            interaction: {
-                intersect: false,
-                mode: 'index'
-            },
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 20
-                    }
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.8)',
-                    titleColor: '#fff',
-                    bodyColor: '#fff',
-                    borderColor: 'rgba(52, 152, 219, 1)',
-                    borderWidth: 1,
-                    cornerRadius: 10
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    title: {
-                        display: true,
-                        text: 'Power Output (MW)',
-                        font: {
-                            size: 14,
-                            weight: 'bold'
-                        }
-                    },
-                    grid: {
-                        color: 'rgba(0,0,0,0.1)'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Prediction Time',
-                        font: {
-                            size: 14,
-                            weight: 'bold'
-                        }
-                    },
-                    grid: {
-                        color: 'rgba(0,0,0,0.1)'
-                    }
-                }
-            }
-        }
-    });
-}
+                    function initializePowerTrendChart() {
+                        const ctx = document.getElementById('powerTrendChart').getContext('2d');
 
-function initializeParametersChart() {
-    const ctx = document.getElementById('parametersChart').getContext('2d');
-    
-    charts.parametersChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: chartData.dates,
-            datasets: [
-                {
-                    label: 'Temperature (°C)',
-                    data: chartData.temperature,
-                    borderColor: 'rgba(231, 76, 60, 1)',
-                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                },
-                {
-                    label: 'Pressure (mbar)',
-                    data: chartData.pressure.map(p => p - 950), // Normalize for visibility
-                    borderColor: 'rgba(52, 152, 219, 1)',
-                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                },
-                {
-                    label: 'Humidity (%)',
-                    data: chartData.humidity,
-                    borderColor: 'rgba(46, 204, 113, 1)',
-                    backgroundColor: 'rgba(46, 204, 113, 0.1)',
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                },
-                {
-                    label: 'Vacuum (cm Hg)',
-                    data: chartData.vacuum,
-                    borderColor: 'rgba(155, 89, 182, 1)',
-                    backgroundColor: 'rgba(155, 89, 182, 0.1)',
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            layout: {
-                padding: {
-                    top: 20,
-                    right: 20,
-                    bottom: 30,
-                    left: 20
-                }
-            },
-            interaction: {
-                intersect: false,
-                mode: 'index'
-            },
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 15
-                    }
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.8)',
-                    cornerRadius: 10,
-                    callbacks: {
-                        label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label === 'Pressure (mbar)') {
-                                // Add back the 950 we subtracted for display
-                                return label + ': ' + (context.raw + 950).toFixed(2) + ' mbar';
+                        charts.powerTrendChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: chartData.dates,
+                                datasets: [{
+                                    label: 'Power Output (MW)',
+                                    data: chartData.power,
+                                    borderColor: 'rgba(52, 152, 219, 1)',
+                                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                                    borderWidth: 3,
+                                    tension: 0.4,
+                                    fill: true,
+                                    pointBackgroundColor: 'rgba(52, 152, 219, 1)',
+                                    pointBorderColor: '#fff',
+                                    pointBorderWidth: 2,
+                                    pointRadius: 6,
+                                    pointHoverRadius: 8
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                layout: {
+                                    padding: {
+                                        top: 20,
+                                        right: 20,
+                                        bottom: 30,
+                                        left: 20
+                                    }
+                                },
+                                interaction: {
+                                    intersect: false,
+                                    mode: 'index'
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: true,
+                                        position: 'top',
+                                        labels: {
+                                            usePointStyle: true,
+                                            padding: 20
+                                        }
+                                    },
+                                    tooltip: {
+                                        backgroundColor: 'rgba(0,0,0,0.8)',
+                                        titleColor: '#fff',
+                                        bodyColor: '#fff',
+                                        borderColor: 'rgba(52, 152, 219, 1)',
+                                        borderWidth: 1,
+                                        cornerRadius: 10
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: false,
+                                        title: {
+                                            display: true,
+                                            text: 'Power Output (MW)',
+                                            font: {
+                                                size: 14,
+                                                weight: 'bold'
+                                            }
+                                        },
+                                        grid: {
+                                            color: 'rgba(0,0,0,0.1)'
+                                        }
+                                    },
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Prediction Time',
+                                            font: {
+                                                size: 14,
+                                                weight: 'bold'
+                                            }
+                                        },
+                                        grid: {
+                                            color: 'rgba(0,0,0,0.1)'
+                                        }
+                                    }
+                                }
                             }
-                            return label + ': ' + context.raw;
-                        }
+                        });
                     }
-                }
-            },
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Prediction Time'
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Normalized Values'
-                    }
-                }
-            }
-        }
-    });
-}
 
-function initializePowerDistributionChart() {
-    const ctx = document.getElementById('powerDistributionChart').getContext('2d');
-    
-    // Create power distribution bins
-    const powerValues = chartData.power;
-    const min = Math.min(...powerValues);
-    const max = Math.max(...powerValues);
-    const binCount = Math.min(6, powerValues.length);
-    const binSize = (max - min) / binCount;
-    
-    const bins = Array(binCount).fill(0);
-    const binLabels = [];
-    
-    for (let i = 0; i < binCount; i++) {
-        const start = min + i * binSize;
-        const end = start + binSize;
-        binLabels.push(`${start.toFixed(1)}-${end.toFixed(1)} MW`);
-        
-        powerValues.forEach(value => {
-            if (value >= start && (value <= end || i === binCount - 1)) bins[i]++;
-        });
-    }
-    
-    charts.powerDistributionChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: binLabels,
-            datasets: [{
-                data: bins,
-                backgroundColor: [
-                    'rgba(231, 76, 60, 0.8)',
-                    'rgba(52, 152, 219, 0.8)',
-                    'rgba(46, 204, 113, 0.8)',
-                    'rgba(155, 89, 182, 0.8)',
-                    'rgba(243, 156, 18, 0.8)',
-                    'rgba(26, 188, 156, 0.8)'
-                ],
-                borderWidth: 3,
-                borderColor: '#fff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            layout: {
-                padding: {
-                    top: 10,
-                    right: 10,
-                    bottom: 20,
-                    left: 10
-                }
-            },
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 15
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = ((context.raw / total) * 100).toFixed(1);
-                            return `${context.label}: ${context.raw} predictions (${percentage}%)`;
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
+                    function initializeParametersChart() {
+                        const ctx = document.getElementById('parametersChart').getContext('2d');
 
-function initializeScatterCharts() {
-    // Temperature vs Power
-    const tempCtx = document.getElementById('tempScatterChart').getContext('2d');
-    const tempData = chartData.temperature.map((temp, i) => ({
-        x: temp,
-        y: chartData.power[i]
-    }));
-    
-    charts.tempScatterChart = new Chart(tempCtx, {
-        type: 'scatter',
-        data: {
-            datasets: [{
-                label: 'Temperature vs Power',
-                data: tempData,
-                backgroundColor: 'rgba(231, 76, 60, 0.6)',
-                borderColor: 'rgba(231, 76, 60, 1)',
-                pointRadius: 6,
-                pointHoverRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            layout: {
-                padding: {
-                    top: 15,
-                    right: 15,
-                    bottom: 25,
-                    left: 15
-                }
-            },
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Temperature (°C)'
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Power Output (MW)'
-                    }
-                }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `Temperature: ${context.parsed.x}°C, Power: ${context.parsed.y} MW`;
-                        }
-                    }
-                }
-            }
-        }
-    });
-    
-    // Pressure vs Power
-    const pressureCtx = document.getElementById('pressureScatterChart').getContext('2d');
-    const pressureData = chartData.pressure.map((pressure, i) => ({
-        x: pressure,
-        y: chartData.power[i]
-    }));
-    
-    charts.pressureScatterChart = new Chart(pressureCtx, {
-        type: 'scatter',
-        data: {
-            datasets: [{
-                label: 'Pressure vs Power',
-                data: pressureData,
-                backgroundColor: 'rgba(52, 152, 219, 0.6)',
-                borderColor: 'rgba(52, 152, 219, 1)',
-                pointRadius: 6,
-                pointHoverRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            layout: {
-                padding: {
-                    top: 15,
-                    right: 15,
-                    bottom: 25,
-                    left: 15
-                }
-            },
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Ambient Pressure (mbar)'
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Power Output (MW)'
-                    }
-                }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `Pressure: ${context.parsed.x} mbar, Power: ${context.parsed.y} MW`;
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
-
-function initializeCorrelationChart() {
-    const ctx = document.getElementById('correlationChart').getContext('2d');
-    
-    // Check if data exists
-    if (!chartData || !chartData.power || chartData.power.length === 0) {
-        console.log('No data available for correlation chart - using sample data');
-        // Use sample data to show chart structure
-        charts.correlationChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Temperature', 'Pressure', 'Humidity', 'Vacuum'],
-                datasets: [{
-                    label: 'Correlation with Power',
-                    data: [0.7, 0.5, 0.3, 0.8], // Sample correlation values
-                    backgroundColor: [
-                        'rgba(231, 76, 60, 0.8)',
-                        'rgba(52, 152, 219, 0.8)',
-                        'rgba(46, 204, 113, 0.8)',
-                        'rgba(155, 89, 182, 0.8)'
-                    ],
-                    borderColor: [
-                        'rgba(231, 76, 60, 1)',
-                        'rgba(52, 152, 219, 1)',
-                        'rgba(46, 204, 113, 1)',
-                        'rgba(155, 89, 182, 1)'
-                    ],
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                layout: {
-                    padding: {
-                        top: 20,
-                        right: 20,
-                        bottom: 30,
-                        left: 20
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: {
-                            padding: 15
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(0,0,0,0.8)',
-                        titleColor: '#fff',
-                        bodyColor: '#fff',
-                        cornerRadius: 10,
-                        callbacks: {
-                            label: function(context) {
-                                return `Correlation: ${context.parsed.y.toFixed(3)}`;
+                        charts.parametersChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: chartData.dates,
+                                datasets: [
+                                    {
+                                        label: 'Temperature (°C)',
+                                        data: chartData.temperature,
+                                        borderColor: 'rgba(231, 76, 60, 1)',
+                                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                                        tension: 0.4,
+                                        pointRadius: 4,
+                                        pointHoverRadius: 6
+                                    },
+                                    {
+                                        label: 'Pressure (mbar)',
+                                        data: chartData.pressure.map(p => p - 950), // Normalize for visibility
+                                        borderColor: 'rgba(52, 152, 219, 1)',
+                                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                                        tension: 0.4,
+                                        pointRadius: 4,
+                                        pointHoverRadius: 6
+                                    },
+                                    {
+                                        label: 'Humidity (%)',
+                                        data: chartData.humidity,
+                                        borderColor: 'rgba(46, 204, 113, 1)',
+                                        backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                                        tension: 0.4,
+                                        pointRadius: 4,
+                                        pointHoverRadius: 6
+                                    },
+                                    {
+                                        label: 'Vacuum (cm Hg)',
+                                        data: chartData.vacuum,
+                                        borderColor: 'rgba(155, 89, 182, 1)',
+                                        backgroundColor: 'rgba(155, 89, 182, 0.1)',
+                                        tension: 0.4,
+                                        pointRadius: 4,
+                                        pointHoverRadius: 6
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                layout: {
+                                    padding: {
+                                        top: 20,
+                                        right: 20,
+                                        bottom: 30,
+                                        left: 20
+                                    }
+                                },
+                                interaction: {
+                                    intersect: false,
+                                    mode: 'index'
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: true,
+                                        position: 'top',
+                                        labels: {
+                                            usePointStyle: true,
+                                            padding: 15
+                                        }
+                                    },
+                                    tooltip: {
+                                        backgroundColor: 'rgba(0,0,0,0.8)',
+                                        cornerRadius: 10,
+                                        callbacks: {
+                                            label: function (context) {
+                                                let label = context.dataset.label || '';
+                                                if (label === 'Pressure (mbar)') {
+                                                    // Add back the 950 we subtracted for display
+                                                    return label + ': ' + (context.raw + 950).toFixed(2) + ' mbar';
+                                                }
+                                                return label + ': ' + context.raw;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Prediction Time'
+                                        }
+                                    },
+                                    y: {
+                                        title: {
+                                            display: true,
+                                            text: 'Normalized Values'
+                                        }
+                                    }
+                                }
                             }
-                        }
+                        });
                     }
-                },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Parameters'
-                        },
-                        grid: {
-                            display: false
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        max: 1,
-                        title: {
-                            display: true,
-                            text: 'Absolute Correlation'
-                        },
-                        grid: {
-                            color: 'rgba(0,0,0,0.1)'
-                        },
-                        ticks: {
-                            stepSize: 0.2
-                        }
-                    }
-                }
-            }
-        });
-        return;
-    }
-    
-    const correlations = [
-        calculateCorrelation(chartData.temperature, chartData.power),
-        calculateCorrelation(chartData.pressure, chartData.power),
-        calculateCorrelation(chartData.humidity, chartData.power),
-        calculateCorrelation(chartData.vacuum, chartData.power)
-    ];
-    
-    console.log('Correlation values:', correlations);
-    
-    charts.correlationChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Temperature', 'Pressure', 'Humidity', 'Vacuum'],
-            datasets: [{
-                label: 'Correlation with Power',
-                data: correlations.map(val => Math.abs(val) || 0), // Ensure valid numbers
-                backgroundColor: [
-                    'rgba(231, 76, 60, 0.8)',
-                    'rgba(52, 152, 219, 0.8)',
-                    'rgba(46, 204, 113, 0.8)',
-                    'rgba(155, 89, 182, 0.8)'
-                ],
-                borderColor: [
-                    'rgba(231, 76, 60, 1)',
-                    'rgba(52, 152, 219, 1)',
-                    'rgba(46, 204, 113, 1)',
-                    'rgba(155, 89, 182, 1)'
-                ],
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            layout: {
-                padding: {
-                    top: 20,
-                    right: 20,
-                    bottom: 30,
-                    left: 20
-                }
-            },
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: {
-                        padding: 15
-                    }
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.8)',
-                    titleColor: '#fff',
-                    bodyColor: '#fff',
-                    cornerRadius: 10,
-                    callbacks: {
-                        label: function(context) {
-                            const actualCorr = correlations[context.dataIndex];
-                            return `Correlation: ${actualCorr ? actualCorr.toFixed(3) : '0.000'}`;
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Parameters'
-                    },
-                    grid: {
-                        display: false
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    max: 1,
-                    title: {
-                        display: true,
-                        text: 'Absolute Correlation'
-                    },
-                    grid: {
-                        color: 'rgba(0,0,0,0.1)'
-                    },
-                    ticks: {
-                        stepSize: 0.2
-                    }
-                }
-            }
-        }
-    });
-}
 
-function calculateCorrelation(x, y) {
-    if (!x || !y || x.length !== y.length || x.length === 0) {
-        console.log('Invalid data for correlation calculation');
-        return 0;
-    }
-    
-    // Convert to numbers and filter out invalid values
-    const validX = x.map(val => parseFloat(val)).filter(val => !isNaN(val));
-    const validY = y.map(val => parseFloat(val)).filter(val => !isNaN(val));
-    
-    if (validX.length !== validY.length || validX.length < 2) {
-        console.log('Insufficient valid data for correlation');
-        return 0;
-    }
-    
-    const n = validX.length;
-    const sumX = validX.reduce((a, b) => a + b, 0);
-    const sumY = validY.reduce((a, b) => a + b, 0);
-    const sumXY = validX.reduce((sum, xi, i) => sum + xi * validY[i], 0);
-    const sumXX = validX.reduce((sum, xi) => sum + xi * xi, 0);
-    const sumYY = validY.reduce((sum, yi) => sum + yi * yi, 0);
-    
-    const numerator = n * sumXY - sumX * sumY;
-    const denominator = Math.sqrt((n * sumXX - sumX * sumX) * (n * sumYY - sumY * sumY));
-    
-    if (denominator === 0) {
-        console.log('Zero denominator in correlation calculation');
-        return 0;
-    }
-    
-    const correlation = numerator / denominator;
-    console.log(`Correlation calculated: ${correlation}`);
-    return isNaN(correlation) ? 0 : correlation;
-}
+                    function initializePowerDistributionChart() {
+                        const ctx = document.getElementById('powerDistributionChart').getContext('2d');
 
-function updateQuickStats() {
-    const power = chartData.power;
-    const avgPower = (power.reduce((a, b) => a + b, 0) / power.length).toFixed(2);
-    const maxPower = Math.max(...power).toFixed(2);
-    const minPower = Math.min(...power).toFixed(2);
-    const stdDev = calculateStandardDeviation(power).toFixed(2);
-    const range = (maxPower - minPower).toFixed(2);
-    
-    document.getElementById('quickStats').innerHTML = `
+                        // Create power distribution bins
+                        const powerValues = chartData.power;
+                        const min = Math.min(...powerValues);
+                        const max = Math.max(...powerValues);
+                        const binCount = Math.min(6, powerValues.length);
+                        const binSize = (max - min) / binCount;
+
+                        const bins = Array(binCount).fill(0);
+                        const binLabels = [];
+
+                        for (let i = 0; i < binCount; i++) {
+                            const start = min + i * binSize;
+                            const end = start + binSize;
+                            binLabels.push(`${start.toFixed(1)}-${end.toFixed(1)} MW`);
+
+                            powerValues.forEach(value => {
+                                if (value >= start && (value <= end || i === binCount - 1)) bins[i]++;
+                            });
+                        }
+
+                        charts.powerDistributionChart = new Chart(ctx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: binLabels,
+                                datasets: [{
+                                    data: bins,
+                                    backgroundColor: [
+                                        'rgba(231, 76, 60, 0.8)',
+                                        'rgba(52, 152, 219, 0.8)',
+                                        'rgba(46, 204, 113, 0.8)',
+                                        'rgba(155, 89, 182, 0.8)',
+                                        'rgba(243, 156, 18, 0.8)',
+                                        'rgba(26, 188, 156, 0.8)'
+                                    ],
+                                    borderWidth: 3,
+                                    borderColor: '#fff'
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                layout: {
+                                    padding: {
+                                        top: 10,
+                                        right: 10,
+                                        bottom: 20,
+                                        left: 10
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom',
+                                        labels: {
+                                            usePointStyle: true,
+                                            padding: 15
+                                        }
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function (context) {
+                                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                                const percentage = ((context.raw / total) * 100).toFixed(1);
+                                                return `${context.label}: ${context.raw} predictions (${percentage}%)`;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    function initializeScatterCharts() {
+                        // Temperature vs Power
+                        const tempCtx = document.getElementById('tempScatterChart').getContext('2d');
+                        const tempData = chartData.temperature.map((temp, i) => ({
+                            x: temp,
+                            y: chartData.power[i]
+                        }));
+
+                        charts.tempScatterChart = new Chart(tempCtx, {
+                            type: 'scatter',
+                            data: {
+                                datasets: [{
+                                    label: 'Temperature vs Power',
+                                    data: tempData,
+                                    backgroundColor: 'rgba(231, 76, 60, 0.6)',
+                                    borderColor: 'rgba(231, 76, 60, 1)',
+                                    pointRadius: 6,
+                                    pointHoverRadius: 8
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                layout: {
+                                    padding: {
+                                        top: 15,
+                                        right: 15,
+                                        bottom: 25,
+                                        left: 15
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Temperature (°C)'
+                                        }
+                                    },
+                                    y: {
+                                        title: {
+                                            display: true,
+                                            text: 'Power Output (MW)'
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function (context) {
+                                                return `Temperature: ${context.parsed.x}°C, Power: ${context.parsed.y} MW`;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+
+                        // Pressure vs Power
+                        const pressureCtx = document.getElementById('pressureScatterChart').getContext('2d');
+                        const pressureData = chartData.pressure.map((pressure, i) => ({
+                            x: pressure,
+                            y: chartData.power[i]
+                        }));
+
+                        charts.pressureScatterChart = new Chart(pressureCtx, {
+                            type: 'scatter',
+                            data: {
+                                datasets: [{
+                                    label: 'Pressure vs Power',
+                                    data: pressureData,
+                                    backgroundColor: 'rgba(52, 152, 219, 0.6)',
+                                    borderColor: 'rgba(52, 152, 219, 1)',
+                                    pointRadius: 6,
+                                    pointHoverRadius: 8
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                layout: {
+                                    padding: {
+                                        top: 15,
+                                        right: 15,
+                                        bottom: 25,
+                                        left: 15
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Ambient Pressure (mbar)'
+                                        }
+                                    },
+                                    y: {
+                                        title: {
+                                            display: true,
+                                            text: 'Power Output (MW)'
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function (context) {
+                                                return `Pressure: ${context.parsed.x} mbar, Power: ${context.parsed.y} MW`;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    function initializeCorrelationChart() {
+                        const ctx = document.getElementById('correlationChart').getContext('2d');
+
+                        // Check if data exists
+                        if (!chartData || !chartData.power || chartData.power.length === 0) {
+                            console.log('No data available for correlation chart - using sample data');
+                            // Use sample data to show chart structure
+                            charts.correlationChart = new Chart(ctx, {
+                                type: 'bar',
+                                data: {
+                                    labels: ['Temperature', 'Pressure', 'Humidity', 'Vacuum'],
+                                    datasets: [{
+                                        label: 'Correlation with Power',
+                                        data: [0.7, 0.5, 0.3, 0.8], // Sample correlation values
+                                        backgroundColor: [
+                                            'rgba(231, 76, 60, 0.8)',
+                                            'rgba(52, 152, 219, 0.8)',
+                                            'rgba(46, 204, 113, 0.8)',
+                                            'rgba(155, 89, 182, 0.8)'
+                                        ],
+                                        borderColor: [
+                                            'rgba(231, 76, 60, 1)',
+                                            'rgba(52, 152, 219, 1)',
+                                            'rgba(46, 204, 113, 1)',
+                                            'rgba(155, 89, 182, 1)'
+                                        ],
+                                        borderWidth: 2
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    layout: {
+                                        padding: {
+                                            top: 20,
+                                            right: 20,
+                                            bottom: 30,
+                                            left: 20
+                                        }
+                                    },
+                                    plugins: {
+                                        legend: {
+                                            display: true,
+                                            position: 'top',
+                                            labels: {
+                                                padding: 15
+                                            }
+                                        },
+                                        tooltip: {
+                                            backgroundColor: 'rgba(0,0,0,0.8)',
+                                            titleColor: '#fff',
+                                            bodyColor: '#fff',
+                                            cornerRadius: 10,
+                                            callbacks: {
+                                                label: function (context) {
+                                                    return `Correlation: ${context.parsed.y.toFixed(3)}`;
+                                                }
+                                            }
+                                        }
+                                    },
+                                    scales: {
+                                        x: {
+                                            title: {
+                                                display: true,
+                                                text: 'Parameters'
+                                            },
+                                            grid: {
+                                                display: false
+                                            }
+                                        },
+                                        y: {
+                                            beginAtZero: true,
+                                            max: 1,
+                                            title: {
+                                                display: true,
+                                                text: 'Absolute Correlation'
+                                            },
+                                            grid: {
+                                                color: 'rgba(0,0,0,0.1)'
+                                            },
+                                            ticks: {
+                                                stepSize: 0.2
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                            return;
+                        }
+
+                        const correlations = [
+                            calculateCorrelation(chartData.temperature, chartData.power),
+                            calculateCorrelation(chartData.pressure, chartData.power),
+                            calculateCorrelation(chartData.humidity, chartData.power),
+                            calculateCorrelation(chartData.vacuum, chartData.power)
+                        ];
+
+                        console.log('Correlation values:', correlations);
+
+                        charts.correlationChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: ['Temperature', 'Pressure', 'Humidity', 'Vacuum'],
+                                datasets: [{
+                                    label: 'Correlation with Power',
+                                    data: correlations.map(val => Math.abs(val) || 0), // Ensure valid numbers
+                                    backgroundColor: [
+                                        'rgba(231, 76, 60, 0.8)',
+                                        'rgba(52, 152, 219, 0.8)',
+                                        'rgba(46, 204, 113, 0.8)',
+                                        'rgba(155, 89, 182, 0.8)'
+                                    ],
+                                    borderColor: [
+                                        'rgba(231, 76, 60, 1)',
+                                        'rgba(52, 152, 219, 1)',
+                                        'rgba(46, 204, 113, 1)',
+                                        'rgba(155, 89, 182, 1)'
+                                    ],
+                                    borderWidth: 2
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                layout: {
+                                    padding: {
+                                        top: 20,
+                                        right: 20,
+                                        bottom: 30,
+                                        left: 20
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: true,
+                                        position: 'top',
+                                        labels: {
+                                            padding: 15
+                                        }
+                                    },
+                                    tooltip: {
+                                        backgroundColor: 'rgba(0,0,0,0.8)',
+                                        titleColor: '#fff',
+                                        bodyColor: '#fff',
+                                        cornerRadius: 10,
+                                        callbacks: {
+                                            label: function (context) {
+                                                const actualCorr = correlations[context.dataIndex];
+                                                return `Correlation: ${actualCorr ? actualCorr.toFixed(3) : '0.000'}`;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Parameters'
+                                        },
+                                        grid: {
+                                            display: false
+                                        }
+                                    },
+                                    y: {
+                                        beginAtZero: true,
+                                        max: 1,
+                                        title: {
+                                            display: true,
+                                            text: 'Absolute Correlation'
+                                        },
+                                        grid: {
+                                            color: 'rgba(0,0,0,0.1)'
+                                        },
+                                        ticks: {
+                                            stepSize: 0.2
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    function calculateCorrelation(x, y) {
+                        if (!x || !y || x.length !== y.length || x.length === 0) {
+                            console.log('Invalid data for correlation calculation');
+                            return 0;
+                        }
+
+                        // Convert to numbers and filter out invalid values
+                        const validX = x.map(val => parseFloat(val)).filter(val => !isNaN(val));
+                        const validY = y.map(val => parseFloat(val)).filter(val => !isNaN(val));
+
+                        if (validX.length !== validY.length || validX.length < 2) {
+                            console.log('Insufficient valid data for correlation');
+                            return 0;
+                        }
+
+                        const n = validX.length;
+                        const sumX = validX.reduce((a, b) => a + b, 0);
+                        const sumY = validY.reduce((a, b) => a + b, 0);
+                        const sumXY = validX.reduce((sum, xi, i) => sum + xi * validY[i], 0);
+                        const sumXX = validX.reduce((sum, xi) => sum + xi * xi, 0);
+                        const sumYY = validY.reduce((sum, yi) => sum + yi * yi, 0);
+
+                        const numerator = n * sumXY - sumX * sumY;
+                        const denominator = Math.sqrt((n * sumXX - sumX * sumX) * (n * sumYY - sumY * sumY));
+
+                        if (denominator === 0) {
+                            console.log('Zero denominator in correlation calculation');
+                            return 0;
+                        }
+
+                        const correlation = numerator / denominator;
+                        console.log(`Correlation calculated: ${correlation}`);
+                        return isNaN(correlation) ? 0 : correlation;
+                    }
+
+                    function updateQuickStats() {
+                        const power = chartData.power;
+                        const avgPower = (power.reduce((a, b) => a + b, 0) / power.length).toFixed(2);
+                        const maxPower = Math.max(...power).toFixed(2);
+                        const minPower = Math.min(...power).toFixed(2);
+                        const stdDev = calculateStandardDeviation(power).toFixed(2);
+                        const range = (maxPower - minPower).toFixed(2);
+
+                        document.getElementById('quickStats').innerHTML = `
         <div class="row">
             <div class="col-12 mb-3">
                 <div class="stats-card" style="background: var(--gradient-success); padding: 1rem;">
@@ -874,51 +880,51 @@ function updateQuickStats() {
             </div>
         </div>
     `;
-}
+                    }
 
-function calculateStandardDeviation(values) {
-    const avg = values.reduce((a, b) => a + b, 0) / values.length;
-    const squareDiffs = values.map(value => Math.pow(value - avg, 2));
-    const avgSquareDiff = squareDiffs.reduce((a, b) => a + b, 0) / squareDiffs.length;
-    return Math.sqrt(avgSquareDiff);
-}
+                    function calculateStandardDeviation(values) {
+                        const avg = values.reduce((a, b) => a + b, 0) / values.length;
+                        const squareDiffs = values.map(value => Math.pow(value - avg, 2));
+                        const avgSquareDiff = squareDiffs.reduce((a, b) => a + b, 0) / squareDiffs.length;
+                        return Math.sqrt(avgSquareDiff);
+                    }
 
-function downloadChart(chartId) {
-    const chart = charts[chartId];
-    if (chart) {
-        const url = chart.toBase64Image('image/png', 1.0);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${chartId}_${new Date().toISOString().split('T')[0]}.png`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    }
-}
+                    function downloadChart(chartId) {
+                        const chart = charts[chartId];
+                        if (chart) {
+                            const url = chart.toBase64Image('image/png', 1.0);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `${chartId}_${new Date().toISOString().split('T')[0]}.png`;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                        }
+                    }
 
-function downloadAllCharts() {
-    Object.keys(charts).forEach((chartId, index) => {
-        setTimeout(() => downloadChart(chartId), index * 500);
-    });
-}
+                    function downloadAllCharts() {
+                        Object.keys(charts).forEach((chartId, index) => {
+                            setTimeout(() => downloadChart(chartId), index * 500);
+                        });
+                    }
 
-function generateReport() {
-    alert('Report generation feature coming soon! For now, you can download individual charts.');
-}
+                    function generateReport() {
+                        alert('Report generation feature coming soon! For now, you can download individual charts.');
+                    }
 
-function shareCharts() {
-    if (navigator.share) {
-        navigator.share({
-            title: 'Power Plant Prediction Analytics',
-            text: 'Check out my power plant prediction analytics!',
-            url: window.location.href
-        });
-    } else {
-        // Fallback - copy URL to clipboard
-        navigator.clipboard.writeText(window.location.href).then(() => {
-            alert('URL copied to clipboard!');
-        });
-    }
-}
-</script>
-{% endblock %}
+                    function shareCharts() {
+                        if (navigator.share) {
+                            navigator.share({
+                                title: 'Power Plant Prediction Analytics',
+                                text: 'Check out my power plant prediction analytics!',
+                                url: window.location.href
+                            });
+                        } else {
+                            // Fallback - copy URL to clipboard
+                            navigator.clipboard.writeText(window.location.href).then(() => {
+                                alert('URL copied to clipboard!');
+                            });
+                        }
+                    }
+                </script>
+                {% endblock %}

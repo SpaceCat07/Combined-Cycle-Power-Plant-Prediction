@@ -3,70 +3,84 @@
 {% block title %}Welcome - Power Plant Predictor{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-5">
-    <div class="row w-100 justify-content-center">
-        <div class="col-lg-10 col-xl-9">
-            <div class="card fade-in">
-                <div class="card-body p-4 p-md-5">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-bolt" style="font-size: 4rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
-                    </div>
-                    
-                    <h1 class="display-4 fw-bold text-center mb-2" style="background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.5rem;">
-                        Combined Cycle Power Plant
-                    </h1>
-                    <h2 class="h3 text-center mb-4 text-muted">
-                        Prediction System
-                    </h2>
-                    
-                    <p class="lead text-center mb-4 text-muted" style="font-size: 1.1rem;">
-                        Prediksi output daya listrik dengan akurasi tinggi menggunakan Random Forest Machine Learning
-                        berdasarkan 4 parameter operasional utama
-                    </p>
-                    
-                    <!-- Action Buttons -->
-                    <div class="d-flex gap-3 justify-content-center mb-5">
-                        <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg px-4 slide-in-right" style="animation-delay: 0.5s;">
-                            <i class="fas fa-sign-in-alt me-2"></i>Login
-                        </a>
-                        <a href="{{ url_for('register') }}" class="btn btn-success btn-lg px-4 slide-in-right" style="animation-delay: 0.6s;">
-                            <i class="fas fa-user-plus me-2"></i>Register
-                        </a>
-                    </div>
+<div class="row align-items-center justify-content-center min-vh-75">
+    <div class="col-lg-10 col-xl-9">
+        <div class="glass-panel text-center p-5 fade-in position-relative overflow-hidden">
+            <!-- Decorative Background Elements -->
+            <div class="position-absolute top-0 start-50 translate-middle"
+                style="width: 300px; height: 300px; background: var(--primary-glow); filter: blur(80px); opacity: 0.3; z-index: 0;">
+            </div>
 
-                    <hr class="my-4">
+            <div class="position-relative z-1">
+                <div class="mb-4">
+                    <i class="fas fa-bolt text-gradient display-1 mb-3 float-animation"></i>
+                </div>
 
-                    <!-- Features Description -->
-                    <div class="row g-4 mb-4">
-                        <div class="col-md-4">
-                            <div class="text-center fade-in" style="animation-delay: 0.7s; padding: 1.5rem;">
-                                <i class="fas fa-robot fa-3x mb-3" style="color: var(--secondary-color);"></i>
-                                <h5 class="fw-bold mb-2">AI-Powered Predictions</h5>
-                                <p class="text-muted mb-0" style="font-size: 0.95rem;">Machine learning model Random Forest untuk prediksi yang akurat</p>
+                <h1 class="display-3 fw-bold mb-3">
+                    <span class="text-white">Combined Cycle</span> <span class="text-gradient">Power Plant</span>
+                </h1>
+
+                <h2 class="h4 text-muted mb-4 fw-light">
+                    Next-Generation Prediction System
+                </h2>
+
+                <p class="lead text-dim mb-5 mx-auto" style="max-width: 700px;">
+                    Experience high-precision power output forecasting powered by advanced Random Forest algorithms.
+                    Real-time analytics for optimal operational efficiency.
+                </p>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-3 justify-content-center mb-5 flex-wrap">
+                    <a href="{{ url_for('login') }}" class="btn-modern-primary btn-lg slide-in-right"
+                        style="animation-delay: 0.1s;">
+                        <i class="fas fa-sign-in-alt me-2"></i>Access Console
+                    </a>
+                    <a href="{{ url_for('register') }}" class="btn-modern-outline btn-lg slide-in-right"
+                        style="animation-delay: 0.2s;">
+                        <i class="fas fa-user-plus me-2"></i>Create Account
+                    </a>
+                </div>
+
+                <hr class="border-secondary opacity-25 my-5">
+
+                <!-- Features Grid -->
+                <div class="row g-4 justify-content-center">
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 hover-bg-light transition-all fade-in" style="animation-delay: 0.3s;">
+                            <div class="mb-3">
+                                <i class="fas fa-robot fa-2x text-primary"></i>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-center fade-in" style="animation-delay: 0.8s; padding: 1.5rem;">
-                                <i class="fas fa-chart-line fa-3x mb-3" style="color: var(--success-color);"></i>
-                                <h5 class="fw-bold mb-2">Interactive Analytics</h5>
-                                <p class="text-muted mb-0" style="font-size: 0.95rem;">Dashboard interaktif dengan visualisasi untuk analisis trend</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-center fade-in" style="animation-delay: 0.9s; padding: 1.5rem;">
-                                <i class="fas fa-history fa-3x mb-3" style="color: var(--warning-color);"></i>
-                                <h5 class="fw-bold mb-2">History Tracking</h5>
-                                <p class="text-muted mb-0" style="font-size: 0.95rem;">Sistem penyimpanan lengkap dengan fitur export data</p>
-                            </div>
+                            <h5 class="fw-bold text-white mb-2">AI-Powered</h5>
+                            <p class="text-muted small mb-0">High-accuracy Random Forest implementation</p>
                         </div>
                     </div>
-
-                    <!-- Demo Login Info -->
-                    <div class="text-center">
-                        <div class="alert alert-info d-inline-block" role="alert" style="max-width: 600px;">
-                            <i class="fas fa-info-circle me-2"></i>
-                            <strong>Demo Account:</strong> Username: <code>admin</code> | Password: <code>admin123</code>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 hover-bg-light transition-all fade-in" style="animation-delay: 0.4s;">
+                            <div class="mb-3">
+                                <i class="fas fa-chart-line fa-2x text-success"></i>
+                            </div>
+                            <h5 class="fw-bold text-white mb-2">Real-time Analytics</h5>
+                            <p class="text-muted small mb-0">Interactive dashboards and trend analysis</p>
                         </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 hover-bg-light transition-all fade-in" style="animation-delay: 0.5s;">
+                            <div class="mb-3">
+                                <i class="fas fa-database fa-2x text-warning"></i>
+                            </div>
+                            <h5 class="fw-bold text-white mb-2">Historical Data</h5>
+                            <p class="text-muted small mb-0">Comprehensive tracking and export capabilities</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Demo Info -->
+                <div class="mt-5 fade-in" style="animation-delay: 0.6s;">
+                    <div class="d-inline-flex align-items-center gap-2 px-4 py-2 rounded-full glass-panel"
+                        style="border-radius: 50px;">
+                        <i class="fas fa-info-circle text-info"></i>
+                        <span class="text-muted small">Demo Access: <strong>admin</strong> /
+                            <strong>admin123</strong></span>
                     </div>
                 </div>
             </div>
@@ -78,14 +92,14 @@
 {% block extra_scripts %}
 <script>
     // Add some interactive effects
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // Parallax effect for the main icon
-        document.addEventListener('mousemove', function(e) {
+        document.addEventListener('mousemove', function (e) {
             const icon = document.querySelector('.fa-bolt');
             if (icon) {
                 const x = e.clientX / window.innerWidth;
                 const y = e.clientY / window.innerHeight;
-                
+
                 icon.style.transform = `translate(${x * 10}px, ${y * 10}px)`;
             }
         });
